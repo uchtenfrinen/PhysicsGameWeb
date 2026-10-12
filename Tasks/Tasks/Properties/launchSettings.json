@@ -1,0 +1,8 @@
+{
+  "profiles": {
+    "PhysicsTasksTerminal": {
+      "commandName": "Project",
+      "commandLineArgs": "--task=sim-resonance"
+    }
+  }
+}

@@ -1,0 +1,354 @@
+<UserControl x:Class="ForTeacher.Views.TeacherWorkspaceView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:conv="clr-namespace:ForTeacher.Converters"
+             xmlns:ctrl="clr-namespace:ForTeacher.Controls"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="1100"
+             Background="Transparent">
+    <UserControl.Resources>
+        <conv:TopicDisplayNameConverter x:Key="TopicDisplayName"/>
+        <conv:TeacherImagePreviewConverter x:Key="TeacherImagePreview"/>
+        <conv:EmptyStringToVisibilityConverter x:Key="EmptyToVis"/>
+        <conv:NonEmptyStringToVisibilityConverter x:Key="NonEmptyToVis"/>
+        <conv:AbsoluteFilePathToImageConverter x:Key="AbsImagePreview"/>
+        <conv:DifficultyToMarkerBrushConverter x:Key="DifficultyMarkerBrush"/>
+    </UserControl.Resources>
+
+    <TabControl Style="{StaticResource HudWorkspaceTabControl}" SelectedIndex="{Binding WorkspaceTabIndex, Mode=TwoWay}">
+        <!-- Список -->
+        <TabItem Header="Список и удаление">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <DockPanel Grid.Row="0" LastChildFill="False" Margin="14,12,14,8">
+                    <StackPanel DockPanel.Dock="Left" Orientation="Horizontal" VerticalAlignment="Center">
+                        <TextBlock Text="⚙" FontSize="14" Foreground="{StaticResource HudAccentCyanBrush}" Margin="0,0,8,0" VerticalAlignment="Center" Opacity="0.85"/>
+                        <TextBlock Text="Раздел" Style="{StaticResource HudCaptionText}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                        <ComboBox Width="220" MinHeight="34"
+                                  ItemsSource="{Binding Sections}"
+                                  DisplayMemberPath="DisplayName"
+                                  SelectedItem="{Binding SelectedSection, Mode=TwoWay}"/>
+                        <Button Content="⟳  Обновить" Margin="12,0,0,0" Command="{Binding RefreshTasksCommand}" Style="{StaticResource HudGhostButton}"/>
+                    </StackPanel>
+
+                    <Button DockPanel.Dock="Right" Command="{Binding GoToAddCommand}" Style="{StaticResource HudPrimaryButton}"
+                            ToolTip="Перейти к форме добавления интерактивной задачи">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Text="📘" FontSize="16" Margin="0,0,10,0" VerticalAlignment="Center"/>
+                            <TextBlock VerticalAlignment="Center" TextAlignment="Left">
+                                <Run Text="Создать новую"/><LineBreak/><Run Text="интерактивную задачу"/>
+                            </TextBlock>
+                        </StackPanel>
+                    </Button>
+                </DockPanel>
+
+                <DataGrid Grid.Row="1" Margin="10,0,10,8"
+                          Style="{StaticResource HudDataGrid}"
+                          ItemsSource="{Binding TasksView}"
+                          SelectedItem="{Binding SelectedTask, Mode=TwoWay}"
+                          AutoGenerateColumns="False"
+                          IsReadOnly="True">
+                    <DataGrid.Columns>
+                        <DataGridTemplateColumn Header="" Width="14">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Width="6" CornerRadius="2" HorizontalAlignment="Center" VerticalAlignment="Stretch" Margin="0,4"
+                                            Background="{Binding Difficulty, Converter={StaticResource DifficultyMarkerBrush}}"/>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                        <DataGridTextColumn Header="Метка (создание)" Binding="{Binding FriendlyId}" Width="2*" ElementStyle="{StaticResource HudGridTextStyle}"/>
+                        <DataGridTemplateColumn Header="Раздел" Width="1.4*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <StackPanel Orientation="Horizontal" VerticalAlignment="Center">
+                                        <Border Width="34" Height="34" CornerRadius="10" Background="#141C2A"
+                                                BorderBrush="{StaticResource HudBorderDimBrush}" BorderThickness="1" Margin="0,0,10,0">
+                                            <TextBlock x:Name="SectionIcon" FontFamily="Segoe UI Emoji" FontSize="17"
+                                                       HorizontalAlignment="Center" VerticalAlignment="Center" Text="📘"/>
+                                        </Border>
+                                        <StackPanel VerticalAlignment="Center">
+                                            <TextBlock Text="{Binding Topic, Converter={StaticResource TopicDisplayName}}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="{Binding Topic}" Style="{StaticResource HudCaptionText}" Margin="0"/>
+                                        </StackPanel>
+                                    </StackPanel>
+                                    <DataTemplate.Triggers>
+                                        <DataTrigger Binding="{Binding Topic}" Value="mechanics">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="⚙"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Topic}" Value="optics">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="🔭"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Topic}" Value="electrostatics">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="⚡"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Topic}" Value="waves">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="〰"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Topic}" Value="electricity">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="🧲"/>
+                                        </DataTrigger>
+                                        <DataTrigger Binding="{Binding Topic}" Value="thermodynamics">
+                                            <Setter TargetName="SectionIcon" Property="Text" Value="🌡"/>
+                                        </DataTrigger>
+                                    </DataTemplate.Triggers>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+
+                        <DataGridTextColumn Header="Заголовок" Binding="{Binding TitleKey}" Width="2.2*" ElementStyle="{StaticResource HudGridTextStyle}"/>
+                        <DataGridTextColumn Header="Сложн." Binding="{Binding Difficulty}" Width="50" ElementStyle="{StaticResource HudGridTextStyle}"/>
+                        <DataGridTextColumn Header="Прикрепленная методичка" Binding="{Binding AttachedMethodichkaStatus}" Width="1.4*" ElementStyle="{StaticResource HudGridTextStyle}"/>
+                        <DataGridTextColumn Header="Ответ" Binding="{Binding ExpectedNumeric, TargetNullValue='—'}" Width="*" ElementStyle="{StaticResource HudGridTextStyle}"/>
+
+                        <DataGridTemplateColumn Header="Картинка" Width="1.6*">
+                            <DataGridTemplateColumn.CellTemplate>
+                                <DataTemplate>
+                                    <Border Height="52" CornerRadius="6" Background="#0F1522" BorderBrush="{StaticResource HudBorderDimBrush}" BorderThickness="1" Padding="4">
+                                        <Image Source="{Binding ImagePath, Converter={StaticResource TeacherImagePreview}}"
+                                               Stretch="Uniform" HorizontalAlignment="Center"/>
+                                    </Border>
+                                </DataTemplate>
+                            </DataGridTemplateColumn.CellTemplate>
+                        </DataGridTemplateColumn>
+                    </DataGrid.Columns>
+                </DataGrid>
+
+                <DockPanel Grid.Row="2" LastChildFill="False" Margin="14,6,14,12">
+                    <Button DockPanel.Dock="Left" Content="Удалить выбранную задачу" Command="{Binding DeleteSelectedCommand}" Style="{StaticResource HudDangerButton}"/>
+
+                    <StackPanel DockPanel.Dock="Right" Orientation="Horizontal">
+                        <Button Margin="0,0,10,0"
+                                Command="{Binding EditSelectedTaskCommand}"
+                                Style="{StaticResource HudGhostButton}"
+                                ToolTip="Открыть форму с данными выбранной задачи">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="✎" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Редактировать задачу" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Command="{Binding ExportSelectedToPdfCommand}"
+                                Style="{StaticResource HudGhostButton}"
+                                ToolTip="Сохранить карточку задачи в PDF">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="⎘" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Экспорт в PDF" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </DockPanel>
+            </Grid>
+        </TabItem>
+
+        <!-- Добавление -->
+        <TabItem Header="Добавить задачу">
+            <DockPanel LastChildFill="True" Margin="0,4,0,0">
+                <Border DockPanel.Dock="Bottom" Background="#0B101C" BorderBrush="{StaticResource HudBorderDimBrush}" BorderThickness="0,1,0,0" Padding="16,12" Margin="0,8,0,0">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Right">
+                        <Button Margin="0,0,10,0" Style="{StaticResource HudGhostButton}" Padding="14,8" Command="{Binding AddForm.ClearFormCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="🧹" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Очистить форму" VerticalAlignment="Center"/>
+                            </StackPanel>
+                        </Button>
+                        <Button Style="{StaticResource HudSaveTaskButton}" Padding="20,10" Command="{Binding AddForm.SaveCommand}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Text="💾" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                <TextBlock Text="Сохранить задачу" VerticalAlignment="Center" FontWeight="SemiBold"/>
+                                <TextBlock Text="✨" Margin="8,0,0,0" VerticalAlignment="Center" Opacity="0.9"/>
+                            </StackPanel>
+                        </Button>
+                    </StackPanel>
+                </Border>
+
+                <ScrollViewer VerticalScrollBarVisibility="Auto" Padding="12,8,12,8">
+                    <Border Style="{StaticResource HudGlowBorder}" Padding="18">
+                        <Border.Effect>
+                            <DropShadowEffect Color="#4AF2E8" BlurRadius="18" ShadowDepth="0" Opacity="0.12"/>
+                        </Border.Effect>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="2*" MinWidth="360"/>
+                                <ColumnDefinition Width="26"/>
+                                <ColumnDefinition Width="*" MinWidth="320"/>
+                            </Grid.ColumnDefinitions>
+
+                            <!-- Левая колонка -->
+                            <StackPanel Grid.Column="0">
+                                <DockPanel LastChildFill="False" Margin="0,0,0,6">
+                                    <TextBlock DockPanel.Dock="Left" Text="Заголовок" Style="{StaticResource HudCaptionText}" Margin="0"/>
+                                    <TextBlock DockPanel.Dock="Right" Text=" " Width="0"/>
+                                </DockPanel>
+                                <Border Style="{StaticResource HudFieldShell}" Margin="0,0,0,14">
+                                    <Grid MinHeight="40">
+                                        <TextBlock Text="Введите заголовок задачи" Margin="4,0,4,0" VerticalAlignment="Center"
+                                                   IsHitTestVisible="False" Opacity="0.45" FontStyle="Italic"
+                                                   Visibility="{Binding AddForm.Title, Converter={StaticResource EmptyToVis}}"/>
+                                        <TextBox Background="Transparent" BorderThickness="0" Padding="2,4"
+                                                 Text="{Binding AddForm.Title, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"/>
+                                    </Grid>
+                                </Border>
+
+                                <TextBlock Text="Текст задачи" Style="{StaticResource HudCaptionText}"/>
+                                <Border Style="{StaticResource HudFieldShell}" Margin="0,0,0,14">
+                                    <Grid MinHeight="160">
+                                        <TextBlock Text="Опишите условие и ожидаемый ход решения…" Margin="4,8,4,0" VerticalAlignment="Top"
+                                                   IsHitTestVisible="False" Opacity="0.45" FontStyle="Italic" TextWrapping="Wrap"
+                                                   Visibility="{Binding AddForm.Text, Converter={StaticResource EmptyToVis}}"/>
+                                        <RichTextBox x:Name="TaskBodyEditor"
+                                                     Margin="0,22,0,0"
+                                                     Background="Transparent"
+                                                     BorderThickness="0"
+                                                     Padding="2,4"
+                                                     Foreground="{StaticResource HudTextPrimaryBrush}"
+                                                     CaretBrush="{StaticResource HudTextPrimaryBrush}"
+                                                     VerticalScrollBarVisibility="Auto"
+                                                     AcceptsReturn="True"
+                                                     LostFocus="TaskBody_OnLostFocus"/>
+                                        <Button HorizontalAlignment="Right" VerticalAlignment="Top" Margin="0,4,4,0" Padding="10,4"
+                                                Style="{StaticResource HudGhostButton}" IsTabStop="False"
+                                                ToolTip="Вставить формулу в текст задачи"
+                                                Click="FormulaButton_OnClick">
+                                            <TextBlock FontStyle="Italic" Foreground="{StaticResource HudAccentCyanBrush}" Text="ƒ (x)"/>
+                                        </Button>
+                                    </Grid>
+                                </Border>
+
+                                <TextBlock Text="Сложность (ИИ + правка вручную)" Style="{StaticResource HudCaptionText}" Margin="0,4,0,0"/>
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6" VerticalAlignment="Center">
+                                    <ctrl:DifficultyRatingStars MinWidth="220"
+                                                                Value="{Binding AddForm.Difficulty, Mode=TwoWay}"
+                                                                ReasoningToolTip="{Binding AddForm.AiReasoning}"/>
+                                    <Button Margin="12,0,0,0" VerticalAlignment="Center" Padding="12,8"
+                                            Command="{Binding AddForm.AnalyzeFromButtonCommand}"
+                                            Style="{StaticResource HudSecondaryButton}"
+                                            Content="Анализировать"/>
+                                    <TextBlock Margin="12,0,0,0" VerticalAlignment="Center" FontSize="11" Foreground="{StaticResource HudAccentCyanBrush}"
+                                               Visibility="{Binding AddForm.IsDifficultyAnalyzing, Converter={StaticResource HudBoolToVisibility}}">
+                                        <Run Text="Запрос к модели…"/>
+                                    </TextBlock>
+                                </StackPanel>
+                                <TextBlock Text="{Binding AddForm.DifficultyAnalysisError}" TextWrapping="Wrap" Margin="0,0,0,8" MaxWidth="520"
+                                           Foreground="{StaticResource HudDangerBrush}" FontSize="11"
+                                           Visibility="{Binding AddForm.DifficultyAnalysisError, Converter={StaticResource NonEmptyToVis}}"/>
+                                <TextBlock Margin="0,0,0,14" FontSize="11" Foreground="{StaticResource HudTextMutedBrush}"
+                                           Text="{Binding AddForm.EstimatedTimeHint}"
+                                           Visibility="{Binding AddForm.EstimatedTimeHint, Converter={StaticResource NonEmptyToVis}}"/>
+
+                                <TextBlock Text="Числовой ответ" Style="{StaticResource HudCaptionText}"/>
+                                <Border Style="{StaticResource HudFieldShell}" Margin="0,0,0,14">
+                                    <Grid MinHeight="42">
+                                        <Grid.ColumnDefinitions>
+                                            <ColumnDefinition Width="*"/>
+                                            <ColumnDefinition Width="Auto"/>
+                                        </Grid.ColumnDefinitions>
+                                        <TextBlock Grid.Column="0" Text="Например: 12.5 или 3.14e-2" Margin="4,0,4,0" VerticalAlignment="Center"
+                                                   IsHitTestVisible="False" Opacity="0.45" FontStyle="Italic"
+                                                   Visibility="{Binding AddForm.NumericAnswerText, Converter={StaticResource EmptyToVis}}"/>
+                                        <TextBox Grid.Column="0" Background="Transparent" BorderThickness="0" Padding="2,4"
+                                                 Text="{Binding AddForm.NumericAnswerText, UpdateSourceTrigger=PropertyChanged, ValidatesOnNotifyDataErrors=True}"/>
+                                        <StackPanel Grid.Column="1" Orientation="Vertical" VerticalAlignment="Center" Margin="12,0,8,0">
+                                            <TextBlock Text="m/s²" FontSize="11" Foreground="{StaticResource HudAccentCyanBrush}" Opacity="0.75" FontStyle="Italic" HorizontalAlignment="Right"/>
+                                            <TextBlock Text="N" FontSize="11" Foreground="{StaticResource HudAccentCyanBrush}" Opacity="0.75" FontStyle="Italic" HorizontalAlignment="Right" Margin="0,2,0,0"/>
+                                        </StackPanel>
+                                    </Grid>
+                                </Border>
+                            </StackPanel>
+
+                            <!-- Правая колонка: раздел, лаборатория, картинка -->
+                            <StackPanel Grid.Column="2" VerticalAlignment="Top" MinWidth="280">
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="🏷" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.9" FontSize="13"/>
+                                    <TextBlock Text="Раздел (topic)" Style="{StaticResource HudCaptionText}" Margin="0"/>
+                                </StackPanel>
+                                <ComboBox MinHeight="38" Margin="0,0,0,14"
+                                          ItemsSource="{Binding AddForm.TopicChoices}"
+                                          SelectedValuePath="TopicKey"
+                                          DisplayMemberPath="DisplayName"
+                                          SelectedValue="{Binding AddForm.SelectedTopicKey, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}"/>
+
+                                <StackPanel Orientation="Horizontal" Margin="0,0,0,6">
+                                    <TextBlock Text="⚛" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.85"/>
+                                    <TextBlock Text="Лаборатория" Style="{StaticResource HudCaptionText}" Margin="0"/>
+                                </StackPanel>
+                                <ComboBox MinHeight="36" Margin="0,0,0,16"
+                                          ItemsSource="{Binding AddForm.LabOptions}"
+                                          DisplayMemberPath="DisplayName"
+                                          SelectedItem="{Binding AddForm.SelectedLab, Mode=TwoWay}"
+                                          ToolTip="В json игры сохраняется строковый LabWpfSetupId (пусто = авто, none = без лаборатории)."/>
+
+                                <Grid Margin="0,0,0,6">
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+                                    <StackPanel Grid.Column="0" Orientation="Horizontal">
+                                        <TextBlock Text="🖼" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.9" />
+                                        <TextBlock Text="Картинка (необязательно)" Style="{StaticResource HudCaptionText}" Margin="0" />
+                                    </StackPanel>
+                                    <StackPanel Grid.Column="2" Orientation="Horizontal" Margin="0,0,0,6">
+                                        <TextBlock Text="📄" Margin="0,0,6,0" VerticalAlignment="Center" Opacity="0.9" />
+                                        <TextBlock Text="Методичка PDF (необязательно)" Style="{StaticResource HudCaptionText}" Margin="0" />
+                                    </StackPanel>
+                                </Grid>
+
+                                <Grid>
+                                    <Grid.RowDefinitions>
+                                        <RowDefinition Height="Auto" />
+                                        <RowDefinition Height="12" />
+                                        <RowDefinition Height="Auto" />
+                                    </Grid.RowDefinitions>
+                                    <Grid.ColumnDefinitions>
+                                        <ColumnDefinition Width="*" />
+                                        <ColumnDefinition Width="16" />
+                                        <ColumnDefinition Width="*" />
+                                    </Grid.ColumnDefinitions>
+
+                                    <Button Grid.Row="0" Grid.Column="0" MinHeight="220" Command="{Binding AddForm.PickImageCommand}" Style="{StaticResource HudImageDropZoneButton}">
+                                        <StackPanel>
+                                            <TextBlock Text="+" FontSize="40" HorizontalAlignment="Center" Foreground="{StaticResource HudAccentLimeBrush}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Добавить изображение" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="160"
+                                                       Foreground="{StaticResource HudTextMutedBrush}" Margin="0,10,0,0" FontSize="12"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Grid.Row="0" Grid.Column="2" MinHeight="220" Command="{Binding AddForm.PickPdfCommand}" Style="{StaticResource HudImageDropZoneButton}">
+                                        <StackPanel>
+                                            <TextBlock Text="+" FontSize="40" HorizontalAlignment="Center" Foreground="{StaticResource HudAccentLimeBrush}" FontWeight="SemiBold"/>
+                                            <TextBlock Text="Добавить методичку (PDF)" TextWrapping="Wrap" TextAlignment="Center" MaxWidth="160"
+                                                       Foreground="{StaticResource HudTextMutedBrush}" Margin="0,10,0,0" FontSize="12"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Grid.Row="2" Grid.Column="0" Padding="14,10" MinHeight="42" HorizontalAlignment="Stretch"
+                                            Command="{Binding AddForm.ClearImageCommand}" Style="{StaticResource HudDangerButton}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="🗑" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Сбросить" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        </StackPanel>
+                                    </Button>
+
+                                    <Button Grid.Row="2" Grid.Column="2" Padding="14,10" MinHeight="42" HorizontalAlignment="Stretch"
+                                            Command="{Binding AddForm.ClearPdfCommand}" Style="{StaticResource HudDangerButton}">
+                                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                                            <TextBlock Text="🗑" Margin="0,0,8,0" VerticalAlignment="Center"/>
+                                            <TextBlock Text="Сбросить" VerticalAlignment="Center" TextWrapping="NoWrap"/>
+                                        </StackPanel>
+                                    </Button>
+                                </Grid>
+                            </StackPanel>
+                        </Grid>
+                    </Border>
+                </ScrollViewer>
+            </DockPanel>
+        </TabItem>
+    </TabControl>
+</UserControl>

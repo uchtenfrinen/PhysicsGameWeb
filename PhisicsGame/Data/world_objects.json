@@ -1,0 +1,10 @@
+[
+  {
+    "Id": "laboratory_portal",
+    "TaskId": "",
+    "Kind": "laboratory",
+    "X": 868,
+    "Y": 292,
+    "InteractionRadius": 100
+  }
+]

@@ -1,0 +1,102 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <Nullable>enable</Nullable>
+    <RollForward>Major</RollForward>
+    <PublishReadyToRun>false</PublishReadyToRun>
+    <TieredCompilation>false</TieredCompilation>
+    <ApplicationManifest>app.manifest</ApplicationManifest>
+    <ApplicationIcon>Icon.ico</ApplicationIcon>
+    <!-- Вкладываем те же свойства, что и при publish -r win-x64, во вложенные сборки (Tasks, ForTeacher, WPF). -->
+    <_PhisicsNestedBuildProps>Configuration=$(Configuration);Platform=$(Platform);RuntimeIdentifier=$(RuntimeIdentifier);SelfContained=$(SelfContained)</_PhisicsNestedBuildProps>
+  </PropertyGroup>
+  <ItemGroup>
+    <PackageReference Include="MonoGame.Framework.WindowsDX" Version="3.8.*" />
+    <PackageReference Include="MonoGame.Content.Builder.Task" Version="3.8.*" />
+    <PackageReference Include="SixLabors.ImageSharp" Version="3.1.12" />
+  </ItemGroup>
+  <!-- Терминал задач собираем MSBuild-целью, без ProjectReference: иначе SDK копирует PhysicsTasksTerminal.exe в этот же output и блокирует обновление при открытом терминале. -->
+  <Target Name="BuildPhysicsTasksTerminalProject" BeforeTargets="CoreBuild">
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\Tasks\Tasks\Tasks.csproj"
+             Targets="Build"
+             Properties="$(_PhisicsNestedBuildProps)" />
+  </Target>
+  <!-- Панель преподавателя: иначе рядом с PhisicsGame.exe остаётся старый ForTeacher.exe и UI «не меняется». -->
+  <Target Name="BuildForTeacherProject" BeforeTargets="CoreBuild">
+    <MSBuild Projects="$(MSBuildProjectDirectory)\..\ForTeacher\ForTeacher\ForTeacher.csproj"
+             Targets="Build"
+             Properties="$(_PhisicsNestedBuildProps)" />
+  </Target>
+  <ItemGroup>
+    <None Update="Data\*.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Update="Assets\Images\*.png">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+  <!-- При указании RuntimeIdentifier (например win-x64) exe лежит в net9.0-windows\win-x64\. -->
+  <Target Name="CopyPhysicsTasksTerminalToGameOutput" AfterTargets="CopyFilesToOutputDirectory">
+    <PropertyGroup>
+      <PhisicsGameRobocopyDest>$([System.String]::Copy('$(TargetDir)').TrimEnd([char]92).TrimEnd([char]47))</PhisicsGameRobocopyDest>
+      <_TasksBinRoot>$([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '..', 'Tasks', 'Tasks', 'bin', '$(Configuration)', 'net9.0-windows'))'))</_TasksBinRoot>
+      <_TasksBin Condition="'$(RuntimeIdentifier)' == ''">$(_TasksBinRoot)</_TasksBin>
+      <_TasksBin Condition="'$(RuntimeIdentifier)' != ''">$([System.IO.Path]::Combine('$(_TasksBinRoot)', '$(RuntimeIdentifier)'))</_TasksBin>
+      <_TasksExe>$([System.IO.Path]::Combine('$(_TasksBin)', 'PhysicsTasksTerminal.exe'))</_TasksExe>
+    </PropertyGroup>
+    <Exec
+      Command="powershell -NoProfile -NonInteractive -Command &quot;$s='$(_TasksBin)'; $d='$(PhisicsGameRobocopyDest)'; if (Test-Path $s) { Copy-Item -Path (Join-Path $s '*') -Destination $d -Recurse -Force -ErrorAction SilentlyContinue; $r=Join-Path $d 'ref'; if (Test-Path $r) { Remove-Item $r -Recurse -Force -ErrorAction SilentlyContinue } }&quot;"
+      Condition="Exists('$(_TasksExe)')"
+      IgnoreExitCode="true"
+      StandardOutputImportance="Low" />
+  </Target>
+  <Target Name="CopyForTeacherToGameOutput" AfterTargets="CopyFilesToOutputDirectory">
+    <PropertyGroup>
+      <PhisicsGameRobocopyDest>$([System.String]::Copy('$(TargetDir)').TrimEnd([char]92).TrimEnd([char]47))</PhisicsGameRobocopyDest>
+      <_TeacherBinRoot>$([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '..', 'ForTeacher', 'ForTeacher', 'bin', '$(Configuration)', 'net9.0-windows'))'))</_TeacherBinRoot>
+      <_TeacherBin Condition="'$(RuntimeIdentifier)' == ''">$(_TeacherBinRoot)</_TeacherBin>
+      <_TeacherBin Condition="'$(RuntimeIdentifier)' != ''">$([System.IO.Path]::Combine('$(_TeacherBinRoot)', '$(RuntimeIdentifier)'))</_TeacherBin>
+      <_TeacherExe>$([System.IO.Path]::Combine('$(_TeacherBin)', 'ForTeacher.exe'))</_TeacherExe>
+    </PropertyGroup>
+    <Exec
+      Command="powershell -NoProfile -NonInteractive -Command &quot;$s='$(_TeacherBin)'; $d='$(PhisicsGameRobocopyDest)'; if (Test-Path $s) { Copy-Item -Path (Join-Path $s '*') -Destination $d -Recurse -Force -ErrorAction SilentlyContinue; $r=Join-Path $d 'ref'; if (Test-Path $r) { Remove-Item $r -Recurse -Force -ErrorAction SilentlyContinue } }&quot;"
+      Condition="Exists('$(_TeacherExe)')"
+      IgnoreExitCode="true"
+      StandardOutputImportance="Low" />
+  </Target>
+  <!-- Лаборатории WPF: без копии WPFPhisics1.1.exe рядом с игрой терминал задач не откроет установку по теме. Собираем после основной игры (у WPF ProjectReference на PhisicsGame). -->
+  <Target Name="BuildWpfPhysicsLabsProject" AfterTargets="CopyForTeacherToGameOutput">
+    <PropertyGroup>
+      <_WpfProj>$(MSBuildProjectDirectory)\..\WPFPhisics1.1\WPFPhisics1.1\WPFPhisics1.1.csproj</_WpfProj>
+    </PropertyGroup>
+    <MSBuild Projects="$(_WpfProj)"
+             Targets="Build"
+             Properties="$(_PhisicsNestedBuildProps);BuildProjectReferences=false" />
+  </Target>
+  <Target Name="CopyWpfPhysicsLabsToGameOutput" AfterTargets="BuildWpfPhysicsLabsProject">
+    <PropertyGroup>
+      <PhisicsGameRobocopyDest>$([System.String]::Copy('$(TargetDir)').TrimEnd([char]92).TrimEnd([char]47))</PhisicsGameRobocopyDest>
+      <_WpfBinRoot>$([System.IO.Path]::GetFullPath('$([System.IO.Path]::Combine('$(MSBuildProjectDirectory)', '..', 'WPFPhisics1.1', 'WPFPhisics1.1', 'bin', '$(Configuration)', 'net9.0-windows'))'))</_WpfBinRoot>
+      <_WpfBin Condition="'$(RuntimeIdentifier)' == ''">$(_WpfBinRoot)</_WpfBin>
+      <_WpfBin Condition="'$(RuntimeIdentifier)' != ''">$([System.IO.Path]::Combine('$(_WpfBinRoot)', '$(RuntimeIdentifier)'))</_WpfBin>
+      <_WpfExe>$([System.IO.Path]::Combine('$(_WpfBin)', 'WPFPhisics1.1.exe'))</_WpfExe>
+    </PropertyGroup>
+    <Exec
+      Command="powershell -NoProfile -NonInteractive -Command &quot;$s='$(_WpfBin)'; $d='$(PhisicsGameRobocopyDest)'; if (Test-Path $s) { Copy-Item -Path (Join-Path $s '*') -Destination $d -Recurse -Force -ErrorAction SilentlyContinue; $r=Join-Path $d 'ref'; if (Test-Path $r) { Remove-Item $r -Recurse -Force -ErrorAction SilentlyContinue } }&quot;"
+      Condition="Exists('$(_WpfExe)')"
+      IgnoreExitCode="true"
+      StandardOutputImportance="Low" />
+  </Target>
+  <!-- dotnet publish копирует только «объявленные» файлы; лаборатории/терминал добавлены в bin после компиляции — дублируем всё содержимое bin в PublishDir. -->
+  <Target Name="MergeBuiltOutputIntoPublishDir" AfterTargets="Publish">
+    <PropertyGroup>
+      <_TrimTargetDir>$([System.String]::Copy('$(TargetDir)').TrimEnd([char]92).TrimEnd([char]47))</_TrimTargetDir>
+      <_TrimPublishDir>$([System.String]::Copy('$(PublishDir)').TrimEnd([char]92).TrimEnd([char]47))</_TrimPublishDir>
+    </PropertyGroup>
+    <Exec
+      Command="powershell -NoProfile -NonInteractive -Command &quot;if ('$(_TrimPublishDir)' -eq '') { exit 0 }; Copy-Item -Path (Join-Path '$(_TrimTargetDir)' '*') -Destination '$(_TrimPublishDir)' -Recurse -Force -ErrorAction SilentlyContinue&quot;"
+      Condition="'$(_TrimPublishDir)' != ''" />
+  </Target>
+</Project>

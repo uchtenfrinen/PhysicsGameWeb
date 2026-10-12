@@ -1,0 +1,29 @@
+<UserControl x:Class="PhysicsTasks.Terminal.Views.ZoomPanHost"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             x:Name="Root"
+             ClipToBounds="True">
+  <Border x:Name="HitSurface"
+          Background="{StaticResource Brush.Surface}"
+          ClipToBounds="True"
+          MouseLeave="HitSurface_MouseLeave"
+          MouseLeftButtonDown="HitSurface_MouseLeftButtonDown"
+          MouseLeftButtonUp="HitSurface_MouseLeftButtonUp"
+          MouseEnter="HitSurface_MouseEnter"
+          MouseMove="HitSurface_MouseMove">
+    <Grid x:Name="TransformRoot"
+          RenderTransformOrigin="0.5,0.5">
+      <Grid.RenderTransform>
+        <TransformGroup>
+          <ScaleTransform ScaleX="{Binding Zoom, ElementName=Root}"
+                          ScaleY="{Binding Zoom, ElementName=Root}" />
+          <TranslateTransform X="{Binding PanX, ElementName=Root}"
+                              Y="{Binding PanY, ElementName=Root}" />
+        </TransformGroup>
+      </Grid.RenderTransform>
+      <ContentPresenter HorizontalAlignment="Center"
+                        VerticalAlignment="Center"
+                        Content="{Binding ZoomContent, ElementName=Root}" />
+    </Grid>
+  </Border>
+</UserControl>

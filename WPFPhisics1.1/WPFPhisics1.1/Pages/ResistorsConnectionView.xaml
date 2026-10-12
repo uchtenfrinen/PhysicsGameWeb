@@ -1,0 +1,220 @@
+<UserControl x:Class="WPFPhisics1._1.Pages.ResistorsConnectionView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WPFPhisics1._1"
+             mc:Ignorable="d"
+             d:DesignHeight="760" d:DesignWidth="1260">
+    <UserControl.Resources>
+        <Style x:Key="GlassCard" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="14"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#AA202637" Offset="0"/>
+                        <GradientStop Color="#AA171B28" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#3A4C66"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect Color="#20000000" BlurRadius="14" ShadowDepth="2" Opacity="0.8"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+        <Style x:Key="NeonSlider" TargetType="Slider">
+            <Setter Property="Foreground" Value="#55D6FF"/>
+            <Setter Property="Height" Value="26"/>
+            <Setter Property="Margin" Value="0,4,0,8"/>
+        </Style>
+        <Style x:Key="ValueBox" TargetType="Border">
+            <Setter Property="Background" Value="#1A2233"/>
+            <Setter Property="BorderBrush" Value="#3D5478"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="8"/>
+            <Setter Property="Padding" Value="6,4"/>
+            <Setter Property="MinWidth" Value="76"/>
+            <Setter Property="HorizontalAlignment" Value="Right"/>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10" Background="#171A23">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <DockPanel Grid.Row="0" Margin="0,0,0,10">
+            <Button x:Name="BackBtn" Content="← К списку установок" Style="{StaticResource BackButtonStyle}" Padding="10,6" HorizontalAlignment="Left" Click="BackBtn_Click"/>
+            <TextBlock Text="Физическая лаборатория" FontSize="22" FontWeight="SemiBold" Foreground="#E8F2FF" HorizontalAlignment="Center" VerticalAlignment="Center"/>
+        </DockPanel>
+
+        <Grid Grid.Row="1">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.2*"/>
+                <ColumnDefinition Width="1*"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Левая часть: единый холст -->
+            <ScrollViewer Grid.Column="0" VerticalScrollBarVisibility="Auto" Margin="0,0,10,0">
+                <StackPanel>
+                    <Border Margin="0,0,0,12" Style="{StaticResource GlassCard}">
+                        <StackPanel>
+                            <TextBlock Text="Рабочая область" FontWeight="SemiBold" FontSize="19" Foreground="#F1F7FF" Margin="0,0,0,10"/>
+                            <TextBlock Text="Последовательное соединение" FontWeight="SemiBold" FontSize="15" Foreground="#D9E9FF" Margin="0,0,0,8"/>
+                            <Border HorizontalAlignment="Stretch" Background="#0E1522" CornerRadius="10" BorderBrush="#33435C" BorderThickness="1" Padding="8">
+                                <local:SeriesResistorsCanvas x:Name="SeriesCanvas" Height="170"/>
+                            </Border>
+                            <TextBlock Text="R = R1 + R2 + R3" FontSize="14" Foreground="#A2C8FF" Margin="0,8,0,0"/>
+
+                            <TextBlock Text="Параллельное соединение" FontWeight="SemiBold" FontSize="15" Foreground="#D9E9FF" Margin="0,12,0,8"/>
+                            <Border HorizontalAlignment="Stretch" Background="#0E1522" CornerRadius="10" BorderBrush="#33435C" BorderThickness="1" Padding="8">
+                                <local:ParallelResistorsCanvas x:Name="ParallelCanvas" Height="260"/>
+                            </Border>
+                            <TextBlock Text="1/R = 1/R1 + 1/R2 + 1/R3   (напряжение U на всех ветвях одинаково)" FontSize="14" TextWrapping="Wrap" Foreground="#A2C8FF" Margin="0,8,0,0"/>
+                        </StackPanel>
+                    </Border>
+                </StackPanel>
+            </ScrollViewer>
+
+            <!-- Правая часть: панель управления -->
+            <Border Grid.Column="1" Style="{StaticResource GlassCard}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="Панель управления" FontWeight="SemiBold" FontSize="18" Foreground="#F1F7FF" Margin="0,0,0,12"/>
+
+                        <Border Background="#1A2233" BorderBrush="#334A6B" BorderThickness="1" CornerRadius="10" Padding="4" Margin="0,0,0,12">
+                            <UniformGrid Columns="2">
+                                <RadioButton Content="Последовательно" IsChecked="{Binding IsSeries, Mode=TwoWay}" GroupName="Connection" Padding="10,6" VerticalAlignment="Center" Foreground="#E8F2FF"/>
+                                <RadioButton Content="Параллельно" IsChecked="{Binding IsSeries, Converter={StaticResource InverseBoolean}, Mode=TwoWay}" GroupName="Connection" Padding="10,6" VerticalAlignment="Center" Foreground="#E8F2FF"/>
+                            </UniformGrid>
+                        </Border>
+
+                        <TextBlock Text="Напряжение U (0–20 В)" Foreground="#CDE2FF" Margin="0,4,0,2"/>
+                        <Grid Margin="0,0,0,6">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Grid.Column="0" Style="{StaticResource NeonSlider}" Minimum="0" Maximum="20" Value="{Binding VoltageV}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Border Grid.Column="1" Style="{StaticResource ValueBox}">
+                                <TextBlock FontSize="16" FontWeight="Bold" Foreground="#85E9FF">
+                                    <Run Text="{Binding VoltageV, StringFormat=F1}"/>
+                                    <Run Text=" В"/>
+                                </TextBlock>
+                            </Border>
+                        </Grid>
+
+                        <Separator Margin="0,6,0,8" BorderBrush="#334A6B"/>
+                        <TextBlock Text="Сопротивления R1, R2, R3 (Ом)" Foreground="#CDE2FF" Margin="0,0,0,4"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Grid.Column="0" Style="{StaticResource NeonSlider}" Minimum="0.1" Maximum="100" Value="{Binding R1}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Border Grid.Column="1" Style="{StaticResource ValueBox}">
+                                <TextBlock Text="{Binding R1, StringFormat=F1}" FontSize="15" FontWeight="SemiBold" Foreground="#E8F2FF"/>
+                            </Border>
+                        </Grid>
+                        <TextBlock Text="R1" FontSize="11" Foreground="#8FA9CA" Margin="0,0,0,0"/>
+                        <Grid Margin="0,0,0,4">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Grid.Column="0" Style="{StaticResource NeonSlider}" Minimum="0.1" Maximum="100" Value="{Binding R2}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Border Grid.Column="1" Style="{StaticResource ValueBox}">
+                                <TextBlock Text="{Binding R2, StringFormat=F1}" FontSize="15" FontWeight="SemiBold" Foreground="#E8F2FF"/>
+                            </Border>
+                        </Grid>
+                        <TextBlock Text="R2" FontSize="11" Foreground="#8FA9CA" Margin="0,0,0,0"/>
+                        <Grid Margin="0,0,0,8">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*"/>
+                                <ColumnDefinition Width="Auto"/>
+                            </Grid.ColumnDefinitions>
+                            <Slider Grid.Column="0" Style="{StaticResource NeonSlider}" Minimum="0.1" Maximum="100" Value="{Binding R3}" VerticalAlignment="Center" Margin="0,0,8,0"/>
+                            <Border Grid.Column="1" Style="{StaticResource ValueBox}">
+                                <TextBlock Text="{Binding R3, StringFormat=F1}" FontSize="15" FontWeight="SemiBold" Foreground="#E8F2FF"/>
+                            </Border>
+                        </Grid>
+                        <TextBlock Text="R3" FontSize="11" Foreground="#8FA9CA" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="Результаты" FontWeight="SemiBold" FontSize="14" Foreground="#F1F7FF" Margin="0,8,0,8"/>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="170"/>
+                                <ColumnDefinition Width="*"/>
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                                <RowDefinition Height="28"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Grid.Row="0" Grid.Column="0" Text="⚡ Напряжение U (В)" VerticalAlignment="Center" FontSize="12" Foreground="#C7DAF4"/>
+                            <TextBlock Grid.Row="0" Grid.Column="1" Text="{Binding VoltageV, StringFormat=F2}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#85E9FF"/>
+                            <TextBlock Grid.Row="1" Grid.Column="0" Text="🔌 Ток I (А)" VerticalAlignment="Center" FontSize="12" Foreground="#C7DAF4"/>
+                            <TextBlock Grid.Row="1" Grid.Column="1" Text="{Binding CurrentA, StringFormat=F3}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#FFE16C"/>
+                            <TextBlock Grid.Row="2" Grid.Column="0" Text="🧱 Rобщ (Ом)" VerticalAlignment="Center" FontSize="12" Foreground="#C7DAF4"/>
+                            <TextBlock Grid.Row="2" Grid.Column="1" Text="{Binding RTotal, StringFormat=F2}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#A8D7FF"/>
+                            <TextBlock Grid.Row="3" Grid.Column="0" Text="🔥 Мощность P (Вт)" VerticalAlignment="Center" FontSize="12" Foreground="#C7DAF4"/>
+                            <TextBlock Grid.Row="3" Grid.Column="1" Text="{Binding PowerW, StringFormat=F2}" VerticalAlignment="Center" FontSize="14" FontWeight="Bold" Foreground="#FFB366"/>
+                        </Grid>
+
+                        <StackPanel Orientation="Horizontal" Margin="0,12,0,0">
+                            <Button Content="Объяснить" Command="{Binding ExplainCommand}" Margin="0,0,8,0" Background="#0E639C" Foreground="#EAF6FF" BorderBrush="#2A8FD5"/>
+                            <Button Content="Объяснить (нейросеть)" Command="{Binding ExplainGroqCommand}" Foreground="#F4ECFF" BorderBrush="#9F7DFF">
+                                <Button.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Color="#6A3DF0" Offset="0"/>
+                                        <GradientStop Color="#8D4DFF" Offset="1"/>
+                                    </LinearGradientBrush>
+                                </Button.Background>
+                                <Button.Style>
+                                    <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                        <Style.Triggers>
+                                            <Trigger Property="IsMouseOver" Value="True">
+                                                <Setter Property="Effect">
+                                                    <Setter.Value>
+                                                        <DropShadowEffect Color="#9B63FF" BlurRadius="18" ShadowDepth="0" Opacity="0.9"/>
+                                                    </Setter.Value>
+                                                </Setter>
+                                            </Trigger>
+                                        </Style.Triggers>
+                                    </Style>
+                                </Button.Style>
+                            </Button>
+                        </StackPanel>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Border Grid.Row="2" Style="{StaticResource GlassCard}" Margin="0,10,0,0" Padding="14">
+            <Grid Margin="0,0,0,2">
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                    <ColumnDefinition Width="*"/>
+                </Grid.ColumnDefinitions>
+                <StackPanel Grid.Column="0" Margin="0,0,8,0">
+                    <TextBlock Text="Дано" FontSize="14" FontWeight="SemiBold" Foreground="#A8D7FF" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding GivenText}" TextWrapping="Wrap" Foreground="#D5E8FF"/>
+                </StackPanel>
+                <StackPanel Grid.Column="1" Margin="8,0">
+                    <TextBlock Text="Решение" FontSize="14" FontWeight="SemiBold" Foreground="#FFE28A" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding SolutionText}" TextWrapping="Wrap" Foreground="#D5E8FF"/>
+                </StackPanel>
+                <StackPanel Grid.Column="2" Margin="8,0,0,0">
+                    <TextBlock Text="Вывод" FontSize="14" FontWeight="SemiBold" Foreground="#FFBE8A" Margin="0,0,0,4"/>
+                    <TextBlock Text="{Binding ConclusionText}" TextWrapping="Wrap" Foreground="#D5E8FF"/>
+                </StackPanel>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

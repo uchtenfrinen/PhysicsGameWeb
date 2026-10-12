@@ -1,0 +1,52 @@
+﻿<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+    <RootNamespace>PhysicsTasks.Terminal</RootNamespace>
+    <AssemblyName>PhysicsTasksTerminal</AssemblyName>
+    <ApplicationTitle>Physics Task Terminal</ApplicationTitle>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="CommunityToolkit.Mvvm" Version="8.4.0" />
+    <PackageReference Include="MdXaml" Version="1.27.0" />
+    <PackageReference Include="PdfiumViewer" Version="2.13.0" />
+    <PackageReference Include="PdfiumViewer.Native.x86_64.v8-xfa" Version="2018.4.8.256" GeneratePathProperty="true" />
+    <PackageReference Include="WpfMath" Version="2.1.0" />
+  </ItemGroup>
+
+  <!--
+    Нативная pdfium.dll из PdfiumViewer.Native.* не попадает рядом с exe (props кладут только в x64\),
+    а DllImport ищет pdfium.dll в каталоге приложения. Копируем после ResolvePackageAssets.
+  -->
+  <Target Name="CopyPdfiumDllNextToExe" AfterTargets="ResolvePackageAssets" BeforeTargets="CopyFilesToOutputDirectory">
+    <PropertyGroup>
+      <_PdfiumFromPkg>$(PkgPdfiumViewer_Native_x86_64_v8_xfa)\Build\x64\pdfium.dll</_PdfiumFromPkg>
+      <_PdfiumFallback>$(NuGetPackageRoot)pdfiumviewer.native.x86_64.v8-xfa\2018.4.8.256\Build\x64\pdfium.dll</_PdfiumFallback>
+    </PropertyGroup>
+    <PropertyGroup Condition="Exists('$(_PdfiumFromPkg)')">
+      <_PdfiumDll>$(_PdfiumFromPkg)</_PdfiumDll>
+    </PropertyGroup>
+    <PropertyGroup Condition="'$(_PdfiumDll)' == '' And Exists('$(_PdfiumFallback)')">
+      <_PdfiumDll>$(_PdfiumFallback)</_PdfiumDll>
+    </PropertyGroup>
+    <ItemGroup Condition="'$(_PdfiumDll)' != ''">
+      <None Include="$(_PdfiumDll)" Link="pdfium.dll" CopyToOutputDirectory="PreserveNewest" Visible="false" />
+    </ItemGroup>
+  </Target>
+
+  <ItemGroup>
+    <ProjectReference Include="..\PhysicsTasks.Core\PhysicsTasks.Core.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <None Update="Data\tasks.json">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+</Project>

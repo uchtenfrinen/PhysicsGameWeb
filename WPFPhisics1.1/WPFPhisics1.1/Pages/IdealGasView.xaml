@@ -1,0 +1,297 @@
+<UserControl x:Class="WPFPhisics1._1.Pages.IdealGasView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WPFPhisics1._1"
+             mc:Ignorable="d"
+             d:DesignHeight="720" d:DesignWidth="1240">
+    <UserControl.Resources>
+        <Style x:Key="DarkCard" TargetType="Border">
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="0,1">
+                        <GradientStop Color="#2A2B2F" Offset="0"/>
+                        <GradientStop Color="#23252A" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect BlurRadius="14" ShadowDepth="2" Opacity="0.22" Color="#000000"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="TitleText" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="15"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+            <Setter Property="Foreground" Value="#E0E0E0"/>
+        </Style>
+
+        <Style x:Key="SmallLabel" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="12"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+
+        <Style x:Key="TopValueBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="8,6"/>
+            <Setter Property="FontSize" Value="13"/>
+            <Setter Property="CaretBrush" Value="#CCCCCC"/>
+        </Style>
+
+        <Style x:Key="GhostButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Background" Value="#2D2D30"/>
+            <Setter Property="Foreground" Value="#CCCCCC"/>
+            <Setter Property="BorderBrush" Value="#3F3F46"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="MinWidth" Value="120"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Background="#1E1E1E" Margin="8">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="220"/>
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="BackBtn"
+                    Grid.Column="0"
+                    Content="← К списку установок"
+                    Style="{StaticResource BackButtonStyle}"
+                    Margin="0,0,12,0"
+                    Padding="10,6"
+                    HorizontalAlignment="Left"
+                    Click="BackBtn_Click"/>
+            <TextBlock Grid.Column="1"
+                       Text="Уравнение состояния идеального газа"
+                       FontSize="26"
+                       FontWeight="Bold"
+                       Foreground="#E0E0E0"
+                       HorizontalAlignment="Center"
+                       VerticalAlignment="Center"/>
+        </Grid>
+
+        <Border Grid.Row="1" Style="{StaticResource DarkCard}" Margin="0,0,0,8" Padding="12">
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="1.25*"/>
+                    <ColumnDefinition Width="1.25*"/>
+                    <ColumnDefinition Width="1.25*"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                    <ColumnDefinition Width="Auto"/>
+                </Grid.ColumnDefinitions>
+
+                <Border Grid.Column="0" Margin="0,0,8,0" Style="{StaticResource DarkCard}" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Количество вещества ν (моль)" Style="{StaticResource SmallLabel}"/>
+                        <DockPanel Margin="0,8,0,0">
+                            <Slider Minimum="0.01" Maximum="3" Value="{Binding N}" TickFrequency="0.01" IsSnapToTickEnabled="False" Margin="0,0,8,0"/>
+                            <TextBox Width="78"
+                                     Style="{StaticResource TopValueBox}"
+                                     Text="{Binding N, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=G4}"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="1" Margin="0,0,8,0" Style="{StaticResource DarkCard}" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Температура T (K)" Style="{StaticResource SmallLabel}"/>
+                        <DockPanel Margin="0,8,0,0">
+                            <Slider Minimum="1" Maximum="1000" Value="{Binding Temperature}" TickFrequency="1" IsSnapToTickEnabled="False" Margin="0,0,8,0"/>
+                            <TextBox Width="78"
+                                     Style="{StaticResource TopValueBox}"
+                                     Text="{Binding Temperature, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N0}"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <Border Grid.Column="2" Margin="0,0,12,0" Style="{StaticResource DarkCard}" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="Объем V (м^3)" Style="{StaticResource SmallLabel}"/>
+                        <DockPanel Margin="0,8,0,0">
+                            <Slider Minimum="0.000001" Maximum="0.25" Value="{Binding Volume}" TickFrequency="0.0001" IsSnapToTickEnabled="False" Margin="0,0,8,0"/>
+                            <TextBox Width="88"
+                                     Style="{StaticResource TopValueBox}"
+                                     Text="{Binding Volume, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=G4}"/>
+                        </DockPanel>
+                    </StackPanel>
+                </Border>
+
+                <Button Grid.Column="3"
+                        Content="{Binding PlayButtonText}"
+                        Command="{Binding PlayAnimationCommand}"
+                        Margin="0,0,8,0"
+                        MinWidth="160">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                            <Setter Property="Background" Value="#0E639C"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                            <Style.Triggers>
+                                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                    <Setter Property="Background" Value="#C62828"/>
+                                </DataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </Button.Style>
+                </Button>
+
+                <Button Grid.Column="4"
+                        Content="Построить"
+                        Command="{Binding BuildCommand}"
+                        Margin="0,0,8,0">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+                            <Setter Property="Background" Value="#0E639C"/>
+                            <Setter Property="Foreground" Value="White"/>
+                            <Setter Property="BorderThickness" Value="0"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+                <Button Grid.Column="5"
+                        Content="Объяснить (нейросеть)"
+                        Command="{Binding ExplainGroqCommand}">
+                    <Button.Style>
+                        <Style TargetType="Button" BasedOn="{StaticResource GhostButton}">
+                            <Setter Property="Background" Value="#6C3DE8"/>
+                            <Setter Property="Foreground" Value="#F1EAFF"/>
+                            <Setter Property="BorderBrush" Value="#8F65FF"/>
+                        </Style>
+                    </Button.Style>
+                </Button>
+            </Grid>
+        </Border>
+
+        <Grid Grid.Row="2" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="2.2*"/>
+                <ColumnDefinition Width="1.3*"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Style="{StaticResource DarkCard}" Margin="0,0,8,0" Padding="10">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    <TextBlock Text="ВИЗУАЛИЗАЦИЯ ПОРШНЯ" Style="{StaticResource TitleText}" Margin="0,0,0,8"/>
+                    <Border Grid.Row="1" CornerRadius="4" BorderBrush="#3F3F46" BorderThickness="1" Background="#2D2D30">
+                        <local:IdealGasCanvas x:Name="GasCanvas"
+                                              DataContext="{Binding}"
+                                              HorizontalAlignment="Stretch"
+                                              VerticalAlignment="Stretch"/>
+                    </Border>
+                </Grid>
+            </Border>
+
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+
+                <Border Grid.Row="0" Style="{StaticResource DarkCard}" Margin="0,0,0,8" Padding="10">
+                    <StackPanel>
+                        <TextBlock Text="РЕЗУЛЬТАТЫ И ГРАФИК" Style="{StaticResource TitleText}" Margin="0,0,0,8"/>
+                        <TextBlock Text="КЛЮЧЕВЫЕ ПОКАЗАТЕЛИ" FontSize="12" FontWeight="Bold" Foreground="#CCCCCC" Margin="0,0,0,4"/>
+                        <TextBlock FontSize="36" FontWeight="Bold" Foreground="#E0E0E0">
+                            <Run Text="P "/><Run Text="{Binding CurrentP, StringFormat=N0}"/><Run Text=" Pa"/>
+                        </TextBlock>
+                        <TextBlock FontSize="30" FontWeight="SemiBold" Foreground="#E0E0E0" Margin="0,2,0,0">
+                            <Run Text="V "/><Run Text="{Binding CurrentV, StringFormat=G4}"/><Run Text=" m^3"/>
+                        </TextBlock>
+                        <TextBlock FontSize="26" FontWeight="SemiBold" Foreground="#E0E0E0" Margin="0,2,0,0">
+                            <Run Text="T "/><Run Text="{Binding Temperature, StringFormat=N0}"/><Run Text=" K"/>
+                        </TextBlock>
+                    </StackPanel>
+                </Border>
+
+                <Grid Grid.Row="1">
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="2*"/>
+                        <ColumnDefinition Width="1*"/>
+                    </Grid.ColumnDefinitions>
+
+                    <Border Grid.Column="0" Style="{StaticResource DarkCard}" Margin="0,0,8,0" Padding="8">
+                        <Grid>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"/>
+                                <RowDefinition Height="*"/>
+                            </Grid.RowDefinitions>
+                            <TextBlock Text="ГРАФИК P-V (изотерма)" FontSize="12" FontWeight="Bold" Foreground="#CCCCCC" Margin="2,0,0,8"/>
+                            <Border Grid.Row="1" BorderBrush="#3F3F46" BorderThickness="1" Background="#2D2D30">
+                                <local:IdealGasChartControl DataContext="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                            </Border>
+                        </Grid>
+                    </Border>
+
+                    <StackPanel Grid.Column="1">
+                        <Border Style="{StaticResource DarkCard}" Margin="0,0,0,8" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="ФОРМУЛЫ" FontSize="12" FontWeight="Bold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                                <TextBlock Text="PV = nuRT" FontSize="20" FontStyle="Italic" FontWeight="SemiBold" Foreground="#E0E0E0" HorizontalAlignment="Center"/>
+                                <Separator Margin="0,8,0,8"/>
+                                <TextBlock Text="P = nuRT / V" FontSize="16" FontWeight="SemiBold" Foreground="#CCCCCC" HorizontalAlignment="Center"/>
+                                <TextBlock Text="nu = PV / RT" FontSize="16" FontWeight="SemiBold" Foreground="#CCCCCC" HorizontalAlignment="Center" Margin="0,6,0,0"/>
+                            </StackPanel>
+                        </Border>
+                        <Border Style="{StaticResource DarkCard}" Padding="8">
+                            <StackPanel>
+                                <TextBlock Text="ОПИСАНИЕ" FontSize="12" FontWeight="Bold" Foreground="#CCCCCC" Margin="0,0,0,6"/>
+                                <TextBlock Text="Изотермический процесс (T = const):" TextWrapping="Wrap" FontSize="12" Foreground="#CCCCCC"/>
+                                <TextBlock Text="P обратно пропорционально V." TextWrapping="Wrap" FontSize="12" Foreground="#CCCCCC" Margin="0,4,0,0"/>
+                            </StackPanel>
+                        </Border>
+                    </StackPanel>
+                </Grid>
+            </Grid>
+        </Grid>
+
+        <Border Grid.Row="3" Style="{StaticResource DarkCard}" Margin="0,0,0,0" Padding="12">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <DockPanel Grid.Row="0" LastChildFill="False">
+                    <TextBlock Text="ОБЪЯСНЕНИЕ НЕЙРОСЕТЬЮ" Style="{StaticResource TitleText}" />
+                    <Button Content="Объяснить"
+                            Command="{Binding ExplainCommand}"
+                            Style="{StaticResource GhostButton}"
+                            Margin="12,0,0,0"
+                            MinWidth="120"/>
+                </DockPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="0,8,0,0">
+                    <TextBox Text="{Binding ExplanationText, Mode=OneWay}"
+                             IsReadOnly="True"
+                             TextWrapping="Wrap"
+                             AcceptsReturn="True"
+                             BorderThickness="0"
+                             Background="Transparent"
+                             Foreground="#CCCCCC"
+                             FontSize="13"
+                             CaretBrush="#CCCCCC"
+                             Padding="0"/>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

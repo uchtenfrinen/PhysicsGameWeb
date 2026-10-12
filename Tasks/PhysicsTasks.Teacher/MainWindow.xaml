@@ -1,0 +1,58 @@
+<Window x:Class="PhysicsTasks.Teacher.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="Physics Tasks — Teacher"
+        Width="720"
+        Height="520"
+        Background="#FF050810"
+        Foreground="#FFE8EEF8"
+        WindowStartupLocation="CenterScreen">
+  <DockPanel Margin="20">
+    <StackPanel DockPanel.Dock="Bottom" Orientation="Horizontal" HorizontalAlignment="Right">
+      <Button x:Name="OpenSharedFolderButton"
+              Margin="0,0,12,0"
+              Padding="14,8"
+              Click="OnOpenSharedFolder"
+              Content="Открыть папку общего каталога" />
+      <Button Padding="14,8"
+              Click="OnClose"
+              Content="Закрыть" />
+    </StackPanel>
+
+    <ScrollViewer VerticalScrollBarVisibility="Auto">
+      <StackPanel>
+        <TextBlock FontSize="22"
+                   FontWeight="SemiBold"
+                   Text="Панель преподавателя (заготовка)" />
+        <TextBlock Margin="0,12,0,0"
+                   TextWrapping="Wrap"
+                   Foreground="#FFB8C5DC"
+                   Text="Отдельное WPF от терминала ученика. Редактор задач и синхронизация с БД подключатся сюда. Общий контракт моделей — PhysicsTasks.Core." />
+
+        <TextBlock Margin="0,20,0,8"
+                   FontWeight="SemiBold"
+                   Text="Общий каталог tasks.json (ProgramData)" />
+        <TextBlock x:Name="SharedPathText"
+                   FontFamily="Consolas"
+                   TextWrapping="Wrap"
+                   Foreground="#FF7FD7FF" />
+
+        <TextBlock Margin="0,16,0,8"
+                   FontWeight="SemiBold"
+                   Text="Прогресс ученика (LocalAppData, тот же файл, что и игра)" />
+        <TextBlock x:Name="SavePathText"
+                   FontFamily="Consolas"
+                   TextWrapping="Wrap"
+                   Foreground="#FF7FD7FF" />
+
+        <TextBlock Margin="0,16,0,8"
+                   FontWeight="SemiBold"
+                   Text="Переопределение пути к каталогу (переменная среды)" />
+        <TextBlock x:Name="EnvHintText"
+                   FontFamily="Consolas"
+                   TextWrapping="Wrap"
+                   Foreground="#FFB8C5DC" />
+      </StackPanel>
+    </ScrollViewer>
+  </DockPanel>
+</Window>

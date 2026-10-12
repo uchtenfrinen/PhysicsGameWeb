@@ -1,0 +1,8 @@
+# API keys (never commit)
+groq_api_key.txt
+
+# Build & IDE
+bin/
+obj/
+.vs/
+*.user

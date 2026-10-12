@@ -1,0 +1,49 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net9.0-windows</TargetFramework>
+    <RootNamespace>WPFPhisics1._1</RootNamespace>
+    <Nullable>enable</Nullable>
+    <ImplicitUsings>enable</ImplicitUsings>
+    <UseWPF>true</UseWPF>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="LiveChartsCore.SkiaSharpView.WPF" Version="2.0.0-rc2" />
+    <PackageReference Include="SharpDX" Version="4.0.1" />
+    <PackageReference Include="SharpDX.Direct3D9" Version="4.0.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\PhisicsGame\PhisicsGame.csproj" />
+  </ItemGroup>
+
+  <!-- Текстуры/Data рядом с exe WPF: BaseDirectory игры = папка хоста; копируем из исходников, не только из bin PhisicsGame. -->
+  <ItemGroup>
+    <None Include="..\..\PhisicsGame\Assets\**\*.*">
+      <Link>Assets\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+    <None Include="..\..\PhisicsGame\Data\**\*.*">
+      <Link>Data\%(RecursiveDir)%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </None>
+  </ItemGroup>
+
+  <Target Name="CopyPhisicsGameHostAssets" AfterTargets="Build">
+    <PropertyGroup>
+      <_PhisicsOutDir>$(MSBuildThisFileDirectory)..\..\PhisicsGame\bin\$(Configuration)\net9.0-windows\</_PhisicsOutDir>
+    </PropertyGroup>
+    <ItemGroup>
+      <_PhisicsFiles Include="$(_PhisicsOutDir)**\*.*" />
+    </ItemGroup>
+    <Copy SourceFiles="@(_PhisicsFiles)" DestinationFolder="$(OutputPath)%(RecursiveDir)" SkipUnchangedFiles="true" Condition="Exists('$(_PhisicsOutDir)PhisicsGame.dll')" />
+  </Target>
+
+  <!-- Ключ Groq: если лежит в папке проекта — копируется в папку с exe при сборке -->
+  <ItemGroup>
+    <None Include="groq_api_key.txt" CopyToOutputDirectory="PreserveNewest" Condition="Exists('groq_api_key.txt')" Link="groq_api_key.txt" />
+  </ItemGroup>
+
+</Project>

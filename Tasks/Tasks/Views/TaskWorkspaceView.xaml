@@ -1,0 +1,550 @@
+<UserControl
+    x:Class="PhysicsTasks.Terminal.Views.TaskWorkspaceView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:conv="clr-namespace:PhysicsTasks.Terminal.Converters"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:math="clr-namespace:WpfMath.Controls;assembly=WpfMath"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    xmlns:md="clr-namespace:MdXaml;assembly=MdXaml"
+    xmlns:views="clr-namespace:PhysicsTasks.Terminal.Views"
+    xmlns:vm="clr-namespace:PhysicsTasks.Terminal.ViewModels"
+    d:DataContext="{d:DesignInstance Type=vm:TaskWorkspaceViewModel}"
+    d:DesignHeight="720"
+    d:DesignWidth="1200"
+    mc:Ignorable="d">
+
+    <UserControl.Resources>
+        <BooleanToVisibilityConverter x:Key="BoolToVis" />
+        <conv:AbsoluteFilePathToBitmapConverter x:Key="AbsPathToBitmap" />
+        <conv:ZoomFactorToPercentConverter x:Key="ZoomToPercent" />
+    </UserControl.Resources>
+
+    <Grid>
+        <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="300" MinWidth="240" />
+            <ColumnDefinition Width="14" />
+            <ColumnDefinition Width="*" />
+        </Grid.ColumnDefinitions>
+
+        <!--  Каталог всех задач слева  -->
+        <Border
+            Grid.Column="0"
+            Padding="10"
+            Background="{StaticResource Brush.Surface}"
+            BorderBrush="#4400E8FF"
+            BorderThickness="1"
+            CornerRadius="14">
+            <DockPanel LastChildFill="True">
+                <TextBlock
+                    Margin="4,0,4,12"
+                    DockPanel.Dock="Top"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="{StaticResource Brush.Accent}"
+                    Text="Каталог задач" />
+                <ListBox
+                    ItemsSource="{Binding Items}"
+                    SelectedItem="{Binding SelectedItem, Mode=TwoWay}"
+                    Style="{StaticResource Phyzix.CatalogListBox}">
+                    <ListBox.ItemTemplate>
+                        <DataTemplate DataType="{x:Type vm:TaskListItemViewModel}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="Auto" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Width="36"
+                                    Height="36"
+                                    Margin="0,0,10,0"
+                                    Background="{StaticResource Brush.SurfaceElevated}"
+                                    BorderBrush="#5500E8FF"
+                                    BorderThickness="1"
+                                    CornerRadius="10">
+                                    <Path
+                                        Margin="7"
+                                        Data="{Binding CatalogGlyph}"
+                                        Fill="#2200E8FF"
+                                        Stretch="Uniform"
+                                        Stroke="{StaticResource Brush.Accent}"
+                                        StrokeThickness="1.1" />
+                                </Border>
+
+                                <StackPanel Grid.Column="1" VerticalAlignment="Center">
+                                    <TextBlock
+                                        FontWeight="SemiBold"
+                                        Foreground="{StaticResource Brush.Text}"
+                                        Text="{Binding Definition.Title}"
+                                        TextWrapping="Wrap" />
+                                    <TextBlock
+                                        Margin="0,2,0,0"
+                                        FontSize="11"
+                                        Foreground="{StaticResource Brush.TextMuted}"
+                                        Text="{Binding Definition.TopicId}" />
+                                </StackPanel>
+
+                                <TextBlock
+                                    Grid.Column="2"
+                                    Margin="6,0,0,0"
+                                    VerticalAlignment="Center"
+                                    FontWeight="Bold"
+                                    Foreground="{StaticResource Brush.Success}"
+                                    Text="✓"
+                                    Visibility="{Binding IsCompleted, Converter={StaticResource BoolToVis}}" />
+                            </Grid>
+                        </DataTemplate>
+                    </ListBox.ItemTemplate>
+                </ListBox>
+            </DockPanel>
+        </Border>
+
+        <!--  Условие, ответ, кнопки  -->
+        <Border
+            Grid.Column="2"
+            Padding="16"
+            Background="{StaticResource Brush.SurfaceElevated}"
+            BorderBrush="#4400E8FF"
+            BorderThickness="1"
+            CornerRadius="16">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="*" />
+                    <RowDefinition Height="Auto" />
+                </Grid.RowDefinitions>
+
+                <StackPanel Grid.Row="0" Margin="0,0,0,8">
+                    <TextBlock
+                        FontSize="32"
+                        FontWeight="SemiBold"
+                        Foreground="{StaticResource Brush.Accent}"
+                        Text="{Binding SelectedItem.Definition.Title, FallbackValue=''}"
+                        TextWrapping="Wrap" />
+                    <Border
+                        Margin="0,10,0,0"
+                        Padding="10,5"
+                        HorizontalAlignment="Left"
+                        Background="{StaticResource Brush.Surface}"
+                        BorderBrush="#4400E8FF"
+                        BorderThickness="1"
+                        CornerRadius="10"
+                        Visibility="{Binding HasDifficulty, Converter={StaticResource BoolToVis}}">
+                        <TextBlock
+                            FontSize="15"
+                            FontWeight="SemiBold"
+                            Foreground="{StaticResource Brush.Text}">
+                            <Run Text="Сложность: " />
+                            <Run Text="{Binding CurrentDifficulty, Mode=OneWay}" />
+                            <Run Text="/5" />
+                        </TextBlock>
+                    </Border>
+                </StackPanel>
+
+                <ScrollViewer
+                    Grid.Row="1"
+                    Margin="0,0,0,8"
+                    HorizontalAlignment="Stretch"
+                    HorizontalContentAlignment="Left"
+                    VerticalContentAlignment="Top"
+                    HorizontalScrollBarVisibility="Disabled"
+                    VerticalScrollBarVisibility="Auto">
+                    <Grid HorizontalAlignment="Stretch">
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                            <RowDefinition Height="Auto" />
+                        </Grid.RowDefinitions>
+
+                        <Border
+                            Grid.Row="0"
+                            MinHeight="150"
+                            Margin="0,0,0,12"
+                            Padding="10,8"
+                            Background="{StaticResource Brush.Surface}"
+                            BorderBrush="#2200E8FF"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Visibility="{Binding HasCondition, Converter={StaticResource BoolToVis}}">
+                            <ItemsControl ItemsSource="{Binding ConditionFragments}">
+                                <ItemsControl.ItemsPanel>
+                                    <ItemsPanelTemplate>
+                                        <WrapPanel Orientation="Horizontal" />
+                                    </ItemsPanelTemplate>
+                                </ItemsControl.ItemsPanel>
+                                <ItemsControl.ItemTemplate>
+                                    <DataTemplate>
+                                        <ContentControl Content="{Binding}">
+                                            <ContentControl.Style>
+                                                <Style TargetType="ContentControl">
+                                                    <Setter Property="ContentTemplate">
+                                                        <Setter.Value>
+                                                            <DataTemplate>
+                                                                <TextBlock
+                                                                    FontSize="18"
+                                                                    Foreground="#EAF7FF"
+                                                                    Text="{Binding Text}"
+                                                                    TextWrapping="Wrap" />
+                                                            </DataTemplate>
+                                                        </Setter.Value>
+                                                    </Setter>
+                                                    <Style.Triggers>
+                                                        <DataTrigger Binding="{Binding IsFormula}" Value="True">
+                                                            <Setter Property="ContentTemplate">
+                                                                <Setter.Value>
+                                                                    <DataTemplate>
+                                                                        <math:FormulaControl
+                                                                            Margin="0,6,0,6"
+                                                                            FontSize="22"
+                                                                            Foreground="#EAF7FF"
+                                                                            Formula="{Binding Text}" />
+                                                                    </DataTemplate>
+                                                                </Setter.Value>
+                                                            </Setter>
+                                                        </DataTrigger>
+                                                    </Style.Triggers>
+                                                </Style>
+                                            </ContentControl.Style>
+                                        </ContentControl>
+                                    </DataTemplate>
+                                </ItemsControl.ItemTemplate>
+                            </ItemsControl>
+                        </Border>
+
+                        <!--  Под условием: две колонки — фото | PDF  -->
+                        <Border
+                            Grid.Row="1"
+                            Margin="0,0,0,12"
+                            Padding="10,8"
+                            Background="{StaticResource Brush.Surface}"
+                            BorderBrush="#4400E8FF"
+                            BorderThickness="1"
+                            CornerRadius="10"
+                            Visibility="{Binding ShowMediaRow, Converter={StaticResource BoolToVis}}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition MinWidth="0">
+                                        <ColumnDefinition.Style>
+                                            <Style TargetType="ColumnDefinition">
+                                                <Setter Property="Width" Value="*" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding HasTaskImage}" Value="False">
+                                                        <Setter Property="Width" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ColumnDefinition.Style>
+                                    </ColumnDefinition>
+                                    <ColumnDefinition Width="12">
+                                        <ColumnDefinition.Style>
+                                            <Style TargetType="ColumnDefinition">
+                                                <Setter Property="Width" Value="12" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ShowMediaGap}" Value="False">
+                                                        <Setter Property="Width" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ColumnDefinition.Style>
+                                    </ColumnDefinition>
+                                    <ColumnDefinition MinWidth="0">
+                                        <ColumnDefinition.Style>
+                                            <Style TargetType="ColumnDefinition">
+                                                <Setter Property="Width" Value="*" />
+                                                <Style.Triggers>
+                                                    <DataTrigger Binding="{Binding ExpectsPdf}" Value="False">
+                                                        <Setter Property="Width" Value="0" />
+                                                    </DataTrigger>
+                                                </Style.Triggers>
+                                            </Style>
+                                        </ColumnDefinition.Style>
+                                    </ColumnDefinition>
+                                </Grid.ColumnDefinitions>
+
+                                <Border
+                                    Grid.Column="0"
+                                    Padding="0,0,8,0"
+                                    Visibility="{Binding HasTaskImage, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="0,0,0,8"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource Brush.TextMuted}"
+                                            Text="Фотография" />
+                                        <StackPanel Margin="0,0,0,8" Orientation="Horizontal">
+                                            <Button
+                                                MinWidth="40"
+                                                Command="{Binding ZoomPreviewPhotoOutCommand}"
+                                                Content="−"
+                                                FontSize="16"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Отдалить" />
+                                            <Button
+                                                MinWidth="40"
+                                                Margin="6,0,0,0"
+                                                Command="{Binding ZoomPreviewPhotoInCommand}"
+                                                Content="+"
+                                                FontSize="16"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Приблизить" />
+                                            <Button
+                                                MinWidth="64"
+                                                Margin="8,0,0,0"
+                                                Command="{Binding ResetPreviewPhotoViewCommand}"
+                                                Content="{Binding PreviewPhotoZoom, Converter={StaticResource ZoomToPercent}}"
+                                                Foreground="{StaticResource Brush.Text}"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Сбросить масштаб и положение (к 100%)" />
+                                            <Button
+                                                Margin="12,0,0,0"
+                                                Command="{Binding OpenPhotoFullscreenCommand}"
+                                                Content="⛶"
+                                                FontSize="15"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="На весь экран" />
+                                        </StackPanel>
+                                        <views:ZoomPanHost
+                                            MaxHeight="360"
+                                            PanX="{Binding PreviewPhotoPanX, Mode=TwoWay}"
+                                            PanY="{Binding PreviewPhotoPanY, Mode=TwoWay}"
+                                            Zoom="{Binding PreviewPhotoZoom}">
+                                            <Image
+                                                HorizontalAlignment="Center"
+                                                Source="{Binding TaskImageAbsolutePath, Converter={StaticResource AbsPathToBitmap}}"
+                                                Stretch="Uniform" />
+                                        </views:ZoomPanHost>
+                                    </StackPanel>
+                                </Border>
+
+                                <Border
+                                    Grid.Column="2"
+                                    Padding="8,0,0,0"
+                                    Visibility="{Binding ExpectsPdf, Converter={StaticResource BoolToVis}}">
+                                    <StackPanel>
+                                        <TextBlock
+                                            Margin="0,0,0,8"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource Brush.TextMuted}"
+                                            Text="Методичка (PDF)" />
+                                        <TextBlock
+                                            Margin="0,0,0,8"
+                                            Foreground="{StaticResource Brush.Danger}"
+                                            Text="{Binding PdfLoadError}"
+                                            TextWrapping="Wrap"
+                                            Visibility="{Binding HasPdfError, Converter={StaticResource BoolToVis}}" />
+                                        <StackPanel
+                                            Margin="0,0,0,8"
+                                            Orientation="Horizontal"
+                                            Visibility="{Binding HasPdf, Converter={StaticResource BoolToVis}}">
+                                            <Button
+                                                MinWidth="40"
+                                                Command="{Binding ZoomPreviewPdfOutCommand}"
+                                                Content="−"
+                                                FontSize="16"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Отдалить" />
+                                            <Button
+                                                MinWidth="40"
+                                                Margin="6,0,0,0"
+                                                Command="{Binding ZoomPreviewPdfInCommand}"
+                                                Content="+"
+                                                FontSize="16"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Приблизить" />
+                                            <Button
+                                                MinWidth="64"
+                                                Margin="8,0,0,0"
+                                                Command="{Binding ResetPreviewPdfViewCommand}"
+                                                Content="{Binding PreviewPdfZoom, Converter={StaticResource ZoomToPercent}}"
+                                                Foreground="{StaticResource Brush.Text}"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="Сбросить масштаб и положение (к 100%)" />
+                                            <Button
+                                                Margin="12,0,0,0"
+                                                Command="{Binding OpenPdfFullscreenCommand}"
+                                                Content="⛶"
+                                                FontSize="15"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}"
+                                                ToolTip="На весь экран" />
+                                        </StackPanel>
+                                        <views:ZoomPanHost
+                                            MaxHeight="420"
+                                            HorizontalAlignment="Center"
+                                            PanX="{Binding PreviewPdfPanX, Mode=TwoWay}"
+                                            PanY="{Binding PreviewPdfPanY, Mode=TwoWay}"
+                                            Visibility="{Binding HasPdf, Converter={StaticResource BoolToVis}}"
+                                            Zoom="{Binding PreviewPdfZoom}">
+                                            <Image
+                                                HorizontalAlignment="Center"
+                                                Source="{Binding PdfPageImage}"
+                                                Stretch="Uniform" />
+                                        </views:ZoomPanHost>
+                                        <StackPanel
+                                            Margin="0,10,0,0"
+                                            HorizontalAlignment="Center"
+                                            Orientation="Horizontal"
+                                            Visibility="{Binding HasPdf, Converter={StaticResource BoolToVis}}">
+                                            <Button
+                                                MinWidth="120"
+                                                Command="{Binding PdfPrevPageCommand}"
+                                                Content="◀ Назад"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}" />
+                                            <TextBlock
+                                                Margin="14,0"
+                                                VerticalAlignment="Center"
+                                                FontWeight="SemiBold"
+                                                Foreground="{StaticResource Brush.Text}"
+                                                Text="{Binding PdfPageLabel}" />
+                                            <Button
+                                                MinWidth="120"
+                                                Command="{Binding PdfNextPageCommand}"
+                                                Content="Вперёд ▶"
+                                                Style="{StaticResource Phyzix.GhostLinkButton}" />
+                                        </StackPanel>
+                                    </StackPanel>
+                                </Border>
+                            </Grid>
+                        </Border>
+
+                        <StackPanel Grid.Row="2" HorizontalAlignment="Stretch">
+                            <Border
+                                Margin="0,0,0,16"
+                                Padding="14"
+                                BorderBrush="{StaticResource Brush.GlassBorder}"
+                                BorderThickness="1"
+                                CornerRadius="16"
+                                Visibility="{Binding HasFormula, Converter={StaticResource BoolToVis}}">
+                                <Border.Background>
+                                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                                        <GradientStop Offset="0" Color="#22081822" />
+                                        <GradientStop Offset="1" Color="#11050A10" />
+                                    </LinearGradientBrush>
+                                </Border.Background>
+                                <Border.Effect>
+                                    <DropShadowEffect
+                                        BlurRadius="22"
+                                        Opacity="0.45"
+                                        ShadowDepth="0"
+                                        Color="#FF00E8FF" />
+                                </Border.Effect>
+                                <Viewbox
+                                    MaxHeight="220"
+                                    HorizontalAlignment="Stretch"
+                                    Stretch="Uniform">
+                                    <Grid Width="220" Height="220">
+                                        <TextBlock
+                                            HorizontalAlignment="Center"
+                                            VerticalAlignment="Center"
+                                            FontFamily="Cascadia Mono, Consolas"
+                                            FontSize="18"
+                                            FontWeight="SemiBold"
+                                            Foreground="{StaticResource Brush.Text}"
+                                            Text="{Binding FormulaText}"
+                                            TextAlignment="Center"
+                                            TextWrapping="Wrap" />
+                                    </Grid>
+                                </Viewbox>
+                            </Border>
+
+                            <TextBlock
+                                Margin="0,0,0,10"
+                                HorizontalAlignment="Left"
+                                FontWeight="SemiBold"
+                                Foreground="{StaticResource Brush.TextMuted}"
+                                Text="Ответ"
+                                TextAlignment="Left" />
+
+                            <StackPanel Visibility="{Binding ShowNumericPanel, Converter={StaticResource BoolToVis}}">
+                                <TextBox
+                                    MinHeight="38"
+                                    Padding="8,6"
+                                    HorizontalAlignment="Stretch"
+                                    Text="{Binding NumericInputText, UpdateSourceTrigger=PropertyChanged}" />
+                            </StackPanel>
+
+                            <ListBox
+                                Margin="0,4,0,0"
+                                HorizontalContentAlignment="Stretch"
+                                ItemsSource="{Binding ChoiceOptions}"
+                                SelectedIndex="{Binding SelectedChoiceIndex, Mode=TwoWay}"
+                                Style="{StaticResource Phyzix.ChoiceListBox}"
+                                Visibility="{Binding ShowChoicePanel, Converter={StaticResource BoolToVis}}">
+                                <ListBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock
+                                            Padding="0,2"
+                                            Foreground="{StaticResource Brush.Text}"
+                                            Text="{Binding}"
+                                            TextWrapping="Wrap" />
+                                    </DataTemplate>
+                                </ListBox.ItemTemplate>
+                            </ListBox>
+
+                            <StackPanel Margin="0,8,0,0" Visibility="{Binding ShowSimulationPanel, Converter={StaticResource BoolToVis}}">
+                                <Slider
+                                    Margin="0,0,0,8"
+                                    IsSnapToTickEnabled="False"
+                                    Maximum="{Binding SimulationMaximum}"
+                                    Minimum="{Binding SimulationMinimum}"
+                                    TickFrequency="0.01"
+                                    Value="{Binding SimulationValue, Mode=TwoWay}" />
+                                <TextBlock Foreground="{StaticResource Brush.TextMuted}">
+                                    <Run Text="Текущее значение: " />
+                                    <Run Text="{Binding SimulationValue, Mode=OneWay, StringFormat=F3}" />
+                                </TextBlock>
+                            </StackPanel>
+
+                            <Button
+                                Margin="0,16,0,0"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding CheckAnswerCommand}"
+                                Content="✓  Проверить решение"
+                                Style="{StaticResource Phyzix.PrimaryActionButton}" />
+                            <Button
+                                Margin="0,10,0,0"
+                                HorizontalAlignment="Stretch"
+                                Command="{Binding OpenLabCommand}"
+                                Content="Открыть лабораторию"
+                                Style="{StaticResource Phyzix.PrimaryActionButton}"
+                                Visibility="{Binding HasLabSetup, Converter={StaticResource BoolToVis}}" />
+                            
+                        </StackPanel>
+                    </Grid>
+                </ScrollViewer>
+
+                <TextBlock
+                    Grid.Row="2"
+                    Margin="0,8,0,0"
+                    FontSize="26"
+                    FontWeight="SemiBold"
+                    Text="{Binding FeedbackMessage}"
+                    TextWrapping="Wrap">
+                    <TextBlock.Style>
+                        <Style TargetType="TextBlock">
+                            <Setter Property="Foreground" Value="{StaticResource Brush.TextMuted}" />
+                            <Style.Triggers>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding HasFeedback}" Value="True" />
+                                        <Condition Binding="{Binding IsFeedbackSuccess}" Value="True" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="{StaticResource Brush.Success}" />
+                                </MultiDataTrigger>
+                                <MultiDataTrigger>
+                                    <MultiDataTrigger.Conditions>
+                                        <Condition Binding="{Binding HasFeedback}" Value="True" />
+                                        <Condition Binding="{Binding IsFeedbackSuccess}" Value="False" />
+                                    </MultiDataTrigger.Conditions>
+                                    <Setter Property="Foreground" Value="{StaticResource Brush.Danger}" />
+                                </MultiDataTrigger>
+                            </Style.Triggers>
+                        </Style>
+                    </TextBlock.Style>
+                </TextBlock>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

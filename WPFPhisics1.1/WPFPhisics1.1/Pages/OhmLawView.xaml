@@ -1,0 +1,220 @@
+<UserControl x:Class="WPFPhisics1._1.Pages.OhmLawView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WPFPhisics1._1"
+             mc:Ignorable="d"
+             d:DesignHeight="780" d:DesignWidth="1280">
+    <UserControl.Resources>
+        <Style x:Key="GlassCard" TargetType="Border" BasedOn="{StaticResource CardBorderStyle}">
+            <Setter Property="CornerRadius" Value="12"/>
+            <Setter Property="Padding" Value="12"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#AA202637" Offset="0"/>
+                        <GradientStop Color="#AA171B28" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#3A4C66"/>
+        </Style>
+        <Style x:Key="ParamCard" TargetType="Border" BasedOn="{StaticResource GlassCard}">
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style x:Key="ActionButton" TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+            <Setter Property="Foreground" Value="#F2F8FF"/>
+            <Setter Property="BorderBrush" Value="#4A6A92"/>
+            <Setter Property="Padding" Value="12,8"/>
+            <Setter Property="Margin" Value="0,0,0,8"/>
+            <Setter Property="HorizontalAlignment" Value="Stretch"/>
+        </Style>
+        <Style x:Key="NeonInner" TargetType="Border">
+            <Setter Property="BorderBrush" Value="#4A6A92"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="Padding" Value="8"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Color="#151A24" Offset="0"/>
+                        <GradientStop Color="#10141C" Offset="1"/>
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="10" Background="#171A23">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Верхняя строка: назад | заголовок | время -->
+        <Grid Grid.Row="0" Margin="0,0,0,6">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="BackBtn" Grid.Column="0" Content="← К списку установок" Style="{StaticResource BackButtonStyle}" Padding="10,6" HorizontalAlignment="Left" VerticalAlignment="Center" Click="BackBtn_Click"/>
+            <StackPanel Grid.Column="1" Margin="12,0,12,0" VerticalAlignment="Center">
+                <TextBlock Foreground="#F1F7FF">
+                    <Run Text="Закон Ома для последовательной цепи" FontSize="26" FontWeight="SemiBold"/>
+                </TextBlock>
+                <TextBlock Text="Простейшая цепь с источником" FontSize="15" Foreground="#8EA1BE" Margin="0,2,0,0"/>
+            </StackPanel>
+            <TextBlock x:Name="ClockText" Grid.Column="2" Text="00:00" FontSize="18" FontWeight="SemiBold" Foreground="#85E9FF" VerticalAlignment="Center" FontFamily="Segoe UI"/>
+        </Grid>
+
+        <Grid Grid.Row="1" MinHeight="420">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="308" MinWidth="260"/>
+                <ColumnDefinition Width="*" MinWidth="400"/>
+                <ColumnDefinition Width="300" MinWidth="260"/>
+            </Grid.ColumnDefinitions>
+
+            <!-- Левая колонка -->
+            <Grid Grid.Column="0" Margin="0,0,10,0">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+                <ScrollViewer Grid.Row="0" VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="ВХОДНЫЕ ПАРАМЕТРЫ" FontWeight="SemiBold" FontSize="14" Foreground="#9BB4D6" Margin="0,0,0,10"/>
+
+                        <!-- I — рассчитывается из ε, r, R -->
+                        <Border Style="{StaticResource ParamCard}" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="⏲ Сила тока I (А)" Foreground="#CDE2FF"/>
+                                <TextBlock Text="рассчитывается: I = ε / (r + R)" Foreground="#8FA9CA" FontSize="11" Margin="0,2,0,0"/>
+                                <DockPanel Margin="0,8,0,0">
+                                    <TextBlock Text="А" Foreground="#8FB4E7" VerticalAlignment="Center" Margin="8,0,0,0" DockPanel.Dock="Right"/>
+                                    <TextBox VerticalContentAlignment="Center" IsReadOnly="True" IsTabStop="False"
+                                             Foreground="#B3E18A" FontWeight="SemiBold"
+                                             Text="{Binding CurrentA, Mode=OneWay, StringFormat=N3}"/>
+                                </DockPanel>
+                                <Slider Minimum="0" Maximum="5" Value="{Binding CurrentA, Mode=OneWay}" Margin="0,8,0,0" IsEnabled="False" Opacity="0.85"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource ParamCard}" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="🔋 ЭДС ε (В)" Foreground="#CDE2FF"/>
+                                <DockPanel Margin="0,6,0,0">
+                                    <TextBlock Text="В" Foreground="#8FB4E7" VerticalAlignment="Center" Margin="8,0,0,0" DockPanel.Dock="Right"/>
+                                    <TextBox VerticalContentAlignment="Center"
+                                             Text="{Binding EpsilonV, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}"/>
+                                </DockPanel>
+                                <Slider Minimum="0.5" Maximum="50" Value="{Binding EpsilonV}" Margin="0,8,0,0" TickFrequency="0.5"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource ParamCard}" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="Ω Внутр. сопротивление r (Ом)" Foreground="#CDE2FF"/>
+                                <DockPanel Margin="0,6,0,0">
+                                    <TextBlock Text="Ом" Foreground="#8FB4E7" VerticalAlignment="Center" Margin="8,0,0,0" DockPanel.Dock="Right"/>
+                                    <TextBox VerticalContentAlignment="Center"
+                                             Text="{Binding InternalOhm, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}"/>
+                                </DockPanel>
+                                <Slider Minimum="0" Maximum="20" Value="{Binding InternalOhm}" Margin="0,8,0,0" TickFrequency="0.5"/>
+                            </StackPanel>
+                        </Border>
+
+                        <Border Style="{StaticResource ParamCard}" Margin="0,0,0,8">
+                            <StackPanel>
+                                <TextBlock Text="Ω Внешнее сопротивление R (Ом)" Foreground="#CDE2FF"/>
+                                <DockPanel Margin="0,6,0,0">
+                                    <TextBlock Text="Ом" Foreground="#8FB4E7" VerticalAlignment="Center" Margin="8,0,0,0" DockPanel.Dock="Right"/>
+                                    <TextBox VerticalContentAlignment="Center"
+                                             Text="{Binding ExternalOhm, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}"/>
+                                </DockPanel>
+                                <Slider Minimum="0.1" Maximum="100" Value="{Binding ExternalOhm}" Margin="0,8,0,0" TickFrequency="1"/>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="{Binding ComputedHint}" Foreground="#8EA1BE" FontSize="11" TextWrapping="Wrap" Margin="0,0,0,4"/>
+                    </StackPanel>
+                </ScrollViewer>
+
+                <StackPanel Grid.Row="1" Margin="0,10,0,0">
+                    <Button Content="〽 Построить" Command="{Binding BuildCommand}" Style="{StaticResource ActionButton}" Background="#0E639C" BorderBrush="#2FA2FF"/>
+                    <Button Content="📄 Объяснить" Command="{Binding ExplainCommand}" Style="{StaticResource ActionButton}" Background="#5C2D91" BorderBrush="#C586F0" Foreground="#F4ECFF"/>
+                    <Button Content="🧠 Объяснить (нейросеть)" Command="{Binding ExplainGroqCommand}" Style="{StaticResource ActionButton}" Background="#4A2780" BorderBrush="#9F7DFF" Foreground="#F4ECFF"/>
+                </StackPanel>
+            </Grid>
+
+            <!-- Центр: схема + объяснение -->
+            <Border Grid.Column="1" Margin="0,0,10,0" Style="{StaticResource GlassCard}" Padding="10">
+                <Border Style="{StaticResource NeonInner}">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="*" MinHeight="380"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="128" MinHeight="100"/>
+                        </Grid.RowDefinitions>
+                        <Grid Margin="0,0,0,8">
+                            <TextBlock Text="ВИЗУАЛИЗАЦИЯ СХЕМЫ" FontWeight="SemiBold" FontSize="15" Foreground="#9BB4D6" VerticalAlignment="Center"/>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center">
+                                <TextBlock Text="⬡" FontSize="16" Foreground="#5A6F90" Margin="0,0,6,0" Opacity="0.55"/>
+                                <TextBlock Text="◆" FontSize="14" Foreground="#5A6F90" Margin="0,0,6,0" Opacity="0.55"/>
+                                <TextBlock Text="⚛" FontSize="18" Foreground="#5A6F90" Margin="0,0,6,0" Opacity="0.55"/>
+                                <TextBlock Text="⚙" FontSize="22" Foreground="#7F90AD"/>
+                            </StackPanel>
+                        </Grid>
+                        <Border Grid.Row="1" Background="#0D1018" CornerRadius="8" BorderBrush="#2FA2FF" BorderThickness="1" Padding="4">
+                            <local:OhmLawCircuitCanvas x:Name="CircuitCanvas" DataContext="{Binding}"
+                                                        MinHeight="380" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        </Border>
+                        <TextBlock Grid.Row="2" Text="ОБЪЯСНЕНИЕ" FontSize="15" FontWeight="SemiBold" Foreground="#F1F7FF" Margin="0,10,0,6"/>
+                        <ScrollViewer Grid.Row="3" VerticalScrollBarVisibility="Auto">
+                            <TextBox Text="{Binding ExplanationText, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                                     AcceptsReturn="True" BorderThickness="0" Foreground="#D5E8FF" Background="Transparent" Padding="0" CaretBrush="#D5E8FF"/>
+                        </ScrollViewer>
+                    </Grid>
+                </Border>
+            </Border>
+
+            <!-- Правая колонка -->
+            <Border Grid.Column="2" Style="{StaticResource GlassCard}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock Text="АНАЛИЗ И ФОРМУЛЫ" FontWeight="SemiBold" FontSize="15" Foreground="#F1F7FF" Margin="0,0,0,10"/>
+
+                        <TextBlock Text="Характеристика цепи U(I)" Foreground="#9BB4D6" FontSize="12" Margin="0,0,0,6"/>
+                        <Border Background="#12151E" BorderBrush="#3A4C66" BorderThickness="1" CornerRadius="8" Height="200" Margin="0,0,0,14">
+                            <local:OhmLawChartControl DataContext="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+                        </Border>
+
+                        <TextBlock Text="РЕЗУЛЬТАТЫ" FontWeight="SemiBold" FontSize="13" Foreground="#9BB4D6" Margin="0,0,0,8"/>
+                        <TextBlock Foreground="#C7DAF4" Margin="0,0,0,4"><Run Text="⚡ Сила тока I: "/><Run Text="{Binding CurrentA, Mode=OneWay, StringFormat=N3}" Foreground="#B3E18A" FontWeight="Bold"/><Run Text=" А"/></TextBlock>
+                        <TextBlock Foreground="#C7DAF4" Margin="0,4,0,0"><Run Text="📊 Напряжение U_R: "/><Run Text="{Binding VoltageExternal, Mode=OneWay, StringFormat=N2}" Foreground="#85E9FF" FontWeight="Bold"/><Run Text=" В"/></TextBlock>
+                        <TextBlock Foreground="#C7DAF4" Margin="0,4,0,0"><Run Text="📉 Падение на r: "/><Run Text="{Binding VoltageInternal, Mode=OneWay, StringFormat=N2}" Foreground="#FFB366" FontWeight="Bold"/><Run Text=" В"/></TextBlock>
+                        <TextBlock Foreground="#C7DAF4" Margin="0,4,0,0"><Run Text="🔥 Мощность P: "/><Run Text="{Binding PowerW, Mode=OneWay, StringFormat=N2}" Foreground="#FFE16C" FontWeight="Bold"/><Run Text=" Вт"/></TextBlock>
+                        <TextBlock Foreground="#C7DAF4" Margin="0,4,0,0"><Run Text="✓ КПД η: "/><Run Text="{Binding EfficiencyPercent, Mode=OneWay, StringFormat=N1}" Foreground="#56D981" FontWeight="Bold"/><Run Text=" %"/></TextBlock>
+
+                        <TextBlock Text="ФОРМУЛЫ" FontWeight="SemiBold" FontSize="13" Foreground="#9BB4D6" Margin="0,14,0,8"/>
+                        <TextBlock FontSize="12" Foreground="#C7DAF4" TextWrapping="Wrap">
+                            <Run Text="I = ε / (r + R)"/><LineBreak/>
+                            <Run Text="U_R = I·R,  U_r = I·r"/><LineBreak/>
+                            <Run Text="P = I²·R,  η = U_R / ε"/>
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,6,0,0" IsHitTestVisible="False">
+            <TextBlock Text="⬡" FontSize="20" Foreground="#3A4C66" Opacity="0.45" Margin="16,0"/>
+            <TextBlock Text="◆" FontSize="18" Foreground="#3A4C66" Opacity="0.45" Margin="16,0"/>
+            <TextBlock Text="⚛" FontSize="22" Foreground="#3A4C66" Opacity="0.45" Margin="16,0"/>
+            <TextBlock Text="⚙" FontSize="26" Foreground="#4A5A78" Opacity="0.55" Margin="16,0"/>
+        </StackPanel>
+    </Grid>
+</UserControl>

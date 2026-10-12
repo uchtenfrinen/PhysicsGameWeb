@@ -1,0 +1,405 @@
+<UserControl
+    x:Class="WPFPhisics1._1.Pages.BuoyancyView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WPFPhisics1._1"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="600"
+    d:DesignWidth="950"
+    mc:Ignorable="d">
+    <Grid Margin="8" Background="#1E1E1E">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" MinHeight="320" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Button
+            x:Name="BackBtn"
+            Grid.Row="0"
+            Margin="0,0,0,8"
+            Padding="10,6"
+            HorizontalAlignment="Left"
+            Background="#2D2D30"
+            BorderBrush="#3F3F46"
+            BorderThickness="1"
+            Click="BackBtn_Click"
+            Content="← К списку установок"
+            Foreground="#CCCCCC" />
+
+        <!--  Верхняя панель параметров  -->
+        <Border
+            Grid.Row="1"
+            Margin="0,0,0,8"
+            Padding="14,12"
+            Background="#252526"
+            BorderBrush="#3F3F46"
+            BorderThickness="1"
+            CornerRadius="6">
+            <StackPanel Orientation="Vertical">
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontSize="19"
+                    FontWeight="SemiBold"
+                    Foreground="#E0E0E0"
+                    Text="Физический Конструктор – Плавание тела (закон Архимеда)" />
+                <TextBlock
+                    Margin="0,0,0,8"
+                    FontSize="13"
+                    Foreground="#CCCCCC"
+                    Text="Куб погружён в жидкость. Закон Архимеда: F_A = ρж g Vпогр, вес P = ρт g V. "
+                    TextWrapping="Wrap" />
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="140" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="20" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="120" />
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
+
+                    <!--  Плотность тела  -->
+                    <TextBlock
+                        Grid.Column="0"
+                        Margin="0,0,6,0"
+                        Style="{StaticResource ParamLabel}"
+                        Text="Плотность тела ρт:" />
+                    <TextBox
+                        Grid.Column="1"
+                        Width="70"
+                        Margin="0,0,4,0"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding RhoBody, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N0}" />
+                    <TextBlock
+                        Grid.Column="2"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Foreground="#CCCCCC"
+                        Text="кг/м³" />
+                    <Slider
+                        Grid.Column="3"
+                        Grid.ColumnSpan="2"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center"
+                        Maximum="2500"
+                        Minimum="1"
+                        Value="{Binding RhoBody}" />
+
+                    <!--  Плотность жидкости  -->
+                    <TextBlock
+                        Grid.Column="5"
+                        Margin="0,0,6,0"
+                        Style="{StaticResource ParamLabel}"
+                        Text="Плотность жидкости ρж:" />
+                    <TextBox
+                        Grid.Column="6"
+                        Width="70"
+                        Margin="0,0,4,0"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding RhoFluid, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N0}" />
+                    <TextBlock
+                        Grid.Column="7"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Foreground="#CCCCCC"
+                        Text="кг/м³" />
+                    <Slider
+                        Grid.Column="8"
+                        Margin="0,0,16,0"
+                        VerticalAlignment="Center"
+                        Maximum="2500"
+                        Minimum="1"
+                        Value="{Binding RhoFluid}" />
+
+                    <!--  Объём куба  -->
+                    <TextBlock
+                        Grid.Column="9"
+                        Margin="0,0,6,0"
+                        Style="{StaticResource ParamLabel}"
+                        Text="Объём V:" />
+                    <TextBox
+                        Grid.Column="10"
+                        Width="80"
+                        Margin="0,0,4,0"
+                        VerticalContentAlignment="Center"
+                        Text="{Binding Volume, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=G4}" />
+                    <TextBlock
+                        Grid.Column="11"
+                        Margin="0,0,8,0"
+                        VerticalAlignment="Center"
+                        Foreground="#CCCCCC"
+                        Text="м³" />
+
+                    <StackPanel
+                        Grid.Column="12"
+                        HorizontalAlignment="Right"
+                        Orientation="Horizontal">
+                        <Button
+                            Padding="12,6"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            Command="{Binding BuildCommand}"
+                            Content="Построить"
+                            Foreground="#CCCCCC" />
+                        <Button
+                            Margin="8,0,0,0"
+                            Padding="12,6"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            Command="{Binding ExplainCommand}"
+                            Content="Объяснить"
+                            Foreground="#CCCCCC" />
+                        <Button
+                            Margin="8,0,0,0"
+                            Padding="12,6"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            Command="{Binding ExplainGroqCommand}"
+                            Content="Нейросеть-помощник"
+                            Foreground="#CCCCCC" />
+                    </StackPanel>
+                </Grid>
+            </StackPanel>
+        </Border>
+
+        <!--  Три колонки: графики слева | установка (крупно) | результаты справа  -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="280" MinWidth="240" />
+                <ColumnDefinition Width="*" MinWidth="360" />
+                <ColumnDefinition Width="340" MinWidth="300" />
+            </Grid.ColumnDefinitions>
+
+            <!--  Левая колонка: два графика  -->
+            <Border
+                Grid.Column="0"
+                Margin="0,0,8,0"
+                Padding="8"
+                Background="#252526"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#CCCCCC"
+                            Text="Погружение x(t), доля" />
+                        <Border
+                            Height="180"
+                            Margin="0,0,0,10"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <local:BuoyancyChartControl
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                DataContext="{Binding}" />
+                        </Border>
+                        <TextBlock
+                            Margin="0,0,0,6"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#CCCCCC"
+                            Text="Плотности ρт и ρж" />
+                        <Border
+                            Height="180"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <local:BuoyancyDensityChartControl
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                DataContext="{Binding}" />
+                        </Border>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+
+            <!--  Центр: крупная установка с водой и кубом  -->
+            <Border
+                Grid.Column="1"
+                Margin="0,0,8,0"
+                Padding="8"
+                Background="#252526"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="6">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="*" MinHeight="260" />
+                    </Grid.RowDefinitions>
+                    <TextBlock
+                        Margin="0,0,0,6"
+                        FontSize="14"
+                        FontWeight="SemiBold"
+                        Foreground="#CCCCCC"
+                        Text="Схема плавания" />
+                    <Border
+                        Grid.Row="1"
+                        Background="#2D2D30"
+                        BorderBrush="#3F3F46"
+                        BorderThickness="1"
+                        CornerRadius="4">
+                        <local:BuoyancyCanvas
+                            x:Name="BuoyancyCanvas"
+                            HorizontalAlignment="Stretch"
+                            VerticalAlignment="Stretch"
+                            DataContext="{Binding}" />
+                    </Border>
+                </Grid>
+            </Border>
+
+            <!--  Правая колонка: результаты и силы  -->
+            <Border
+                Grid.Column="2"
+                Padding="12"
+                Background="#252526"
+                BorderBrush="#3F3F46"
+                BorderThickness="1"
+                CornerRadius="6">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,8"
+                            FontSize="14"
+                            FontWeight="SemiBold"
+                            Foreground="#E0E0E0"
+                            Text="Результаты" />
+
+                        <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                            <Ellipse
+                                Width="8"
+                                Height="8"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"
+                                Fill="#4CAF50" />
+                            <TextBlock FontSize="13" Foreground="#CCCCCC">
+                                <Run Text="Сила Архимеда Fₐ: " /><Run Text="{Binding ArchimedesForce, StringFormat=N2}" /><Run Text=" Н" />
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                            <Ellipse
+                                Width="8"
+                                Height="8"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"
+                                Fill="#F44336" />
+                            <TextBlock FontSize="13" Foreground="#CCCCCC">
+                                <Run Text="Вес тела P: " /><Run Text="{Binding Weight, StringFormat=N2}" /><Run Text=" Н" />
+                            </TextBlock>
+                        </StackPanel>
+                        <StackPanel Margin="0,0,0,4" Orientation="Horizontal">
+                            <Ellipse
+                                Width="8"
+                                Height="8"
+                                Margin="0,0,6,0"
+                                VerticalAlignment="Center"
+                                Fill="#FFEB3B" />
+                            <TextBlock FontSize="13" Foreground="#CCCCCC">
+                                <Run Text="Доля погружения: " /><Run Text="{Binding SubmergedFraction, StringFormat=P1}" />
+                            </TextBlock>
+                        </StackPanel>
+
+                        <TextBlock
+                            Margin="0,6,0,2"
+                            FontSize="13"
+                            Foreground="#CCCCCC"
+                            Text="{Binding ConditionText}"
+                            TextWrapping="Wrap" />
+                        <TextBlock
+                            Margin="0,0,0,8"
+                            FontSize="12"
+                            Foreground="#AAAAAA"
+                            Text="{Binding StatusInequality}" />
+
+                        <TextBlock
+                            Margin="0,10,0,4"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="#E0E0E0"
+                            Text="Схема сил" />
+                        <Border
+                            Height="150"
+                            Margin="0,0,0,12"
+                            Background="#2D2D30"
+                            BorderBrush="#3F3F46"
+                            BorderThickness="1"
+                            CornerRadius="4">
+                            <local:BuoyancyForcesSchemeControl
+                                HorizontalAlignment="Stretch"
+                                VerticalAlignment="Stretch"
+                                DataContext="{Binding}" />
+                        </Border>
+
+                        <TextBlock
+                            Margin="0,4,0,4"
+                            FontSize="13"
+                            FontWeight="SemiBold"
+                            Foreground="#E0E0E0"
+                            Text="Формулы" />
+                        <TextBlock
+                            FontSize="11"
+                            Foreground="#CCCCCC"
+                            TextWrapping="Wrap">
+                            <Run Text="Fₐ = ρж · g · Vпогр" /><LineBreak />
+                            <Run Text="P = ρт · g · V" /><LineBreak />
+                            <Run Text="Vпогр / V = ρт / ρж" />
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!--  Объяснение нейросетью  -->
+        <Border
+            Grid.Row="3"
+            Margin="0,8,0,0"
+            Padding="8"
+            Background="#252526"
+            BorderBrush="#3F3F46"
+            BorderThickness="1"
+            CornerRadius="6">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="120" MinHeight="80" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Margin="0,0,0,4"
+                    FontSize="14"
+                    FontWeight="SemiBold"
+                    Foreground="#CCCCCC"
+                    Text="Объяснение" />
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+                    <TextBox
+                        Padding="0"
+                        AcceptsReturn="True"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="#CCCCCC"
+                        IsReadOnly="True"
+                        Text="{Binding ExplanationText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

@@ -1,0 +1,180 @@
+<UserControl x:Class="WPFPhisics1._1.Pages.ChargeInFieldView"
+             xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+             xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+             xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+             xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+             xmlns:local="clr-namespace:WPFPhisics1._1"
+             mc:Ignorable="d"
+             d:DesignHeight="550" d:DesignWidth="900">
+    <UserControl.Resources>
+        <Style x:Key="GlassCard" TargetType="Border">
+            <Setter Property="CornerRadius" Value="10"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="BorderBrush" Value="#35FFFFFF"/>
+            <Setter Property="Background">
+                <Setter.Value>
+                    <SolidColorBrush Color="#4422252B"/>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="Padding" Value="10"/>
+        </Style>
+        <Style x:Key="GlowTitle" TargetType="TextBlock">
+            <Setter Property="Foreground" Value="#EAF2FF"/>
+            <Setter Property="FontWeight" Value="SemiBold"/>
+        </Style>
+        <Style x:Key="ParamBox" TargetType="TextBox">
+            <Setter Property="Background" Value="#1B1F28"/>
+            <Setter Property="Foreground" Value="#F5F7FF"/>
+            <Setter Property="BorderBrush" Value="#3B4358"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="7,5"/>
+            <Setter Property="CaretBrush" Value="#F5F7FF"/>
+        </Style>
+    </UserControl.Resources>
+
+    <Grid Margin="8" Background="#14171F">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+
+        <!-- Шапка -->
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="BackBtn" Grid.Column="0" Content="← К списку установок" Style="{StaticResource BackButtonStyle}" Margin="0,0,12,0" Padding="10,6" HorizontalAlignment="Left" Click="BackBtn_Click"/>
+            <StackPanel Grid.Column="1">
+                <TextBlock Text="Заряд в однородном электрическом поле" FontSize="30" FontWeight="Bold" Foreground="#F3F6FF"/>
+                <TextBlock Text="Физический конструктор" FontSize="14" Foreground="#BCC7DD"/>
+            </StackPanel>
+        </Grid>
+
+        <!-- Параметры -->
+        <Border Grid.Row="1" Style="{StaticResource GlassCard}" Margin="0,0,0,8">
+            <UniformGrid Rows="1" Columns="5">
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="⚡ Заряд q (Кл)" Style="{StaticResource GlowTitle}" Margin="0,0,0,6"/>
+                        <TextBox Style="{StaticResource ParamBox}" Text="{Binding Q, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=G3}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="⇵ Напряженность E (В/м)" Style="{StaticResource GlowTitle}" Margin="0,0,0,6"/>
+                        <TextBox Style="{StaticResource ParamBox}" Text="{Binding E, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N0}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="◈ Масса m (кг)" Style="{StaticResource GlowTitle}" Margin="0,0,0,6"/>
+                        <TextBox Style="{StaticResource ParamBox}" Text="{Binding M, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=G3}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource GlassCard}" Margin="0,0,8,0">
+                    <StackPanel>
+                        <TextBlock Text="≈ v₀ (м/с)" Style="{StaticResource GlowTitle}" Margin="0,0,0,6"/>
+                        <TextBox Style="{StaticResource ParamBox}" Text="{Binding V0, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N1}"/>
+                    </StackPanel>
+                </Border>
+                <Border Style="{StaticResource GlassCard}">
+                    <StackPanel>
+                        <TextBlock Text="∡ Угол α (°)" Style="{StaticResource GlowTitle}" Margin="0,0,0,6"/>
+                        <TextBox Style="{StaticResource ParamBox}" Text="{Binding AngleDegrees, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N1}"/>
+                    </StackPanel>
+                </Border>
+            </UniformGrid>
+        </Border>
+
+        <!-- Центр + правая панель -->
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="3*"/>
+                <ColumnDefinition Width="*" MinWidth="230"/>
+            </Grid.ColumnDefinitions>
+
+            <Border Grid.Column="0" Margin="0,0,8,0" Style="{StaticResource GlassCard}" Padding="8">
+                <local:ChargeTrajectoryCanvas x:Name="TrajectoryCanvas" DataContext="{Binding}" HorizontalAlignment="Stretch" VerticalAlignment="Stretch"/>
+            </Border>
+
+            <Border Grid.Column="1" Style="{StaticResource GlassCard}" Padding="10" MinWidth="260">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <!-- Блок кнопок управления (без дублей) -->
+                        <Border Style="{StaticResource GlassCard}" Margin="0,0,0,10">
+                            <StackPanel>
+                                <Button Content="📈 Построить траекторию" Command="{Binding BuildCommand}" Margin="0,0,0,6">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Setter Property="Background" Value="#0F6BD8"/>
+                                            <Setter Property="Foreground" Value="#EAF5FF"/>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button Content="🧠 Объяснить (нейросеть)" Command="{Binding ExplainGroqCommand}" Margin="0,0,0,6">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Setter Property="Background" Value="#6C3DE8"/>
+                                            <Setter Property="Foreground" Value="#F4ECFF"/>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                                <Button x:Name="PlayBtn" Content="▶ Запустить анимацию" Command="{Binding PlayAnimationCommand}">
+                                    <Button.Style>
+                                        <Style TargetType="Button" BasedOn="{StaticResource {x:Type Button}}">
+                                            <Setter Property="Background" Value="#10A36C"/>
+                                            <Setter Property="Foreground" Value="White"/>
+                                            <Style.Triggers>
+                                                <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                                    <Setter Property="Content" Value="⏹ Остановить анимацию"/>
+                                                    <Setter Property="Background" Value="#C62828"/>
+                                                </DataTrigger>
+                                            </Style.Triggers>
+                                        </Style>
+                                    </Button.Style>
+                                </Button>
+                            </StackPanel>
+                        </Border>
+
+                        <TextBlock Text="Результаты" FontSize="16" FontWeight="SemiBold" Foreground="#EAF2FF" Margin="0,0,0,8"/>
+                        <TextBlock Foreground="#E5ECFF"><Run Text="🚀 Ускорение a: "/><Run Text="{Binding Acceleration, StringFormat=N2}"/><Run Text=" м/с²"/></TextBlock>
+                        <TextBlock Foreground="#E5ECFF" Margin="0,8,0,0"><Run Text="⏱ Время полёта T: "/><Run Text="{Binding TimeOfFlight, StringFormat=N2}"/><Run Text=" с"/></TextBlock>
+                        <TextBlock Foreground="#E5ECFF" Margin="0,8,0,0"><Run Text="📏 Дальность L: "/><Run Text="{Binding Range, StringFormat=N2}"/><Run Text=" м"/></TextBlock>
+                        <TextBlock Foreground="#E5ECFF" Margin="0,8,0,0"><Run Text="🏔 Макс. высота H: "/><Run Text="{Binding MaxHeight, StringFormat=N2}"/><Run Text=" м"/></TextBlock>
+
+                        <TextBlock Text="Формулы" FontWeight="SemiBold" Foreground="#C9D4F6" Margin="0,14,0,4"/>
+                        <TextBlock FontSize="11" TextWrapping="Wrap" Foreground="#DDE6FF">
+                            <Run Text="a = q·E/m,   a_y = -qE/m"/><LineBreak/>
+                            <Run Text="x = v₀ cos α · t"/><LineBreak/>
+                            <Run Text="y = v₀ sin α · t + a_y t²/2"/><LineBreak/>
+                            <Run Text="T = -2v₀ sin α / a_y"/><LineBreak/>
+                            <Run Text="L = v₀ cos α · T"/>
+                        </TextBlock>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <!-- Нижняя панель объяснения -->
+        <Border Grid.Row="3" Style="{StaticResource GlassCard}" Margin="0,8,0,0">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="140"/>
+                </Grid.RowDefinitions>
+                <DockPanel Margin="8,8,8,0" LastChildFill="False">
+                    <TextBlock Text="Объяснение" FontSize="16" FontWeight="SemiBold" Foreground="#EAF2FF"/>
+                    <Button Content="⚙ Уравнения" Command="{Binding ExplainCommand}" Margin="10,0,0,0" Padding="10,4"
+                            Background="#2A3145" Foreground="#DDE6FF" BorderBrush="#3E4A68" BorderThickness="1"/>
+                </DockPanel>
+                <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto" Margin="8">
+                    <TextBox Text="{Binding ExplanationText, Mode=OneWay}" IsReadOnly="True" TextWrapping="Wrap"
+                             AcceptsReturn="True" BorderThickness="0" Background="Transparent" Foreground="#E5ECFF" Padding="0"/>
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>

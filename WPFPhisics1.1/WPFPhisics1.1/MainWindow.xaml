@@ -1,0 +1,40 @@
+<Window x:Class="WPFPhisics1._1.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:WPFPhisics1._1"
+        mc:Ignorable="d"
+        Title="Физический конструктор"
+        WindowState="Maximized"
+        WindowStyle="None"
+        ResizeMode="NoResize"
+        Background="{StaticResource SurfaceBrush}">
+    <Grid Margin="0">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+        </Grid.RowDefinitions>
+        <Grid Grid.Row="0" Margin="16,16,16,10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="Auto"/>
+                <ColumnDefinition Width="*"/>
+                <ColumnDefinition Width="Auto"/>
+            </Grid.ColumnDefinitions>
+            <Button x:Name="MainBackButton" Grid.Column="0" Content="← Назад" Click="MainBackButton_Click"
+                    HorizontalAlignment="Left" Padding="14,10" FontSize="13" FontWeight="SemiBold"
+                    Style="{StaticResource BackButtonStyle}" Cursor="Hand" Visibility="Collapsed"/>
+            <StackPanel Grid.Column="2" Orientation="Horizontal" HorizontalAlignment="Right">
+                <Button x:Name="OpenChatButton" Content="Чат с нейросетью" Click="OpenChatButton_Click"
+                        Padding="16,10" FontSize="13" FontWeight="SemiBold"/>
+                <Button x:Name="CloseWindowButton" Content="✕" ToolTip="Закрыть" Click="CloseWindowButton_Click"
+                        Padding="12,8" MinWidth="44" MinHeight="36" Margin="10,0,0,0" FontSize="16" FontWeight="SemiBold"
+                        Cursor="Hand" Style="{StaticResource BackButtonStyle}"/>
+            </StackPanel>
+        </Grid>
+        <Border Grid.Row="1" Margin="16,0,16,16" Background="{StaticResource CardBrush}" BorderBrush="{StaticResource BorderLightBrush}"
+                BorderThickness="1" CornerRadius="12" Padding="0">
+            <ContentControl x:Name="MainContent"/>
+        </Border>
+    </Grid>
+</Window>

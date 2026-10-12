@@ -1,0 +1,274 @@
+<UserControl
+    x:Class="WPFPhisics1._1.Pages.HarmonicOscillationsView"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+    xmlns:local="clr-namespace:WPFPhisics1._1"
+    xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+    d:DesignHeight="760"
+    d:DesignWidth="1280"
+    mc:Ignorable="d">
+    <UserControl.Resources>
+        <Style
+            x:Key="GlassCard"
+            BasedOn="{StaticResource CardBorderStyle}"
+            TargetType="Border">
+            <Setter Property="CornerRadius" Value="12" />
+            <Setter Property="Padding" Value="12" />
+            <Setter Property="Background">
+                <Setter.Value>
+                    <LinearGradientBrush StartPoint="0,0" EndPoint="1,1">
+                        <GradientStop Offset="0" Color="#AA202637" />
+                        <GradientStop Offset="1" Color="#AA171B28" />
+                    </LinearGradientBrush>
+                </Setter.Value>
+            </Setter>
+            <Setter Property="BorderBrush" Value="#3A4C66" />
+        </Style>
+        <Style
+            x:Key="ParamCard"
+            BasedOn="{StaticResource GlassCard}"
+            TargetType="Border">
+            <Setter Property="Padding" Value="10" />
+            <Setter Property="MinWidth" Value="170" />
+        </Style>
+        <Style
+            x:Key="ActionButton"
+            BasedOn="{StaticResource {x:Type Button}}"
+            TargetType="Button">
+            <Setter Property="Foreground" Value="#F2F8FF" />
+            <Setter Property="BorderBrush" Value="#4A6A92" />
+            <Setter Property="Padding" Value="12,7" />
+            <Setter Property="Margin" Value="0,0,0,8" />
+            <Setter Property="HorizontalAlignment" Value="Stretch" />
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect
+                        BlurRadius="12"
+                        Opacity="0.6"
+                        ShadowDepth="0"
+                        Color="#4A85FF" />
+                </Setter.Value>
+            </Setter>
+        </Style>
+    </UserControl.Resources>
+    <Grid Margin="10" Background="#171A23">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="Auto" />
+            <RowDefinition Height="*" />
+            <RowDefinition Height="Auto" />
+        </Grid.RowDefinitions>
+
+        <Grid Grid.Row="0" Margin="0,0,0,8">
+            <Button
+                x:Name="BackBtn"
+                Padding="10,6"
+                HorizontalAlignment="Left"
+                Click="BackBtn_Click"
+                Content="← К списку установок"
+                Style="{StaticResource BackButtonStyle}" />
+        </Grid>
+
+        <StackPanel Grid.Row="1" Margin="0,0,0,8">
+            <TextBlock
+                FontSize="34"
+                FontWeight="SemiBold"
+                Foreground="#F1F7FF"
+                Text="Гармонические колебания" />
+            <TextBlock
+                Margin="0,0,0,10"
+                FontSize="16"
+                Foreground="#8EA1BE"
+                Text="Физическая лаборатория" />
+            <Grid>
+                <Grid.ColumnDefinitions>
+                    <ColumnDefinition Width="*" />
+                    <ColumnDefinition Width="220" />
+                </Grid.ColumnDefinitions>
+                <WrapPanel Grid.Column="0" Margin="0,0,8,0">
+                    <Border Margin="0,0,8,0" Style="{StaticResource ParamCard}">
+                        <StackPanel>
+                            <TextBlock Foreground="#CDE2FF" Text="〰 Амплитуда A (м)" />
+                            <DockPanel Margin="0,6,0,0">
+                                <TextBlock
+                                    Margin="0,0,8,0"
+                                    Foreground="#8FB4E7"
+                                    Text="A" />
+                                <TextBox Width="74" Text="{Binding Amplitude, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Margin="0,0,8,0" Style="{StaticResource ParamCard}">
+                        <StackPanel>
+                            <TextBlock Foreground="#CDE2FF" Text="⏱ Период T (с)" />
+                            <DockPanel Margin="0,6,0,0">
+                                <TextBlock
+                                    Margin="0,0,8,0"
+                                    Foreground="#8FB4E7"
+                                    Text="T" />
+                                <TextBox Width="74" Text="{Binding Period, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Margin="0,0,8,0" Style="{StaticResource ParamCard}">
+                        <StackPanel>
+                            <TextBlock Foreground="#CDE2FF" Text="◷ Период T (с)" />
+                            <DockPanel Margin="0,6,0,0">
+                                <TextBlock
+                                    Margin="0,0,8,0"
+                                    Foreground="#8FB4E7"
+                                    Text="T" />
+                                <TextBox Width="74" Text="{Binding Period, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N2}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                    <Border Style="{StaticResource ParamCard}">
+                        <StackPanel>
+                            <TextBlock Foreground="#CDE2FF" Text="∡ Нач. фаза φ₀ (°)" />
+                            <DockPanel Margin="0,6,0,0">
+                                <TextBlock
+                                    Margin="0,0,8,0"
+                                    Foreground="#8FB4E7"
+                                    Text="φ₀" />
+                                <TextBox Width="74" Text="{Binding Phi0Degrees, UpdateSourceTrigger=LostFocus, Converter={StaticResource FlexibleDouble}, ConverterParameter=N1}" />
+                            </DockPanel>
+                        </StackPanel>
+                    </Border>
+                </WrapPanel>
+                <StackPanel Grid.Column="1">
+                    <Button
+                        Background="#0E639C"
+                        BorderBrush="#2FA2FF"
+                        Command="{Binding BuildCommand}"
+                        Content="〽 Построить график"
+                        Style="{StaticResource ActionButton}" />
+                    <Button BorderBrush="#56D981" Command="{Binding PlayAnimationCommand}">
+                        <Button.Style>
+                            <Style BasedOn="{StaticResource ActionButton}" TargetType="Button">
+                                <Setter Property="Background" Value="#128A43" />
+                                <Setter Property="Content" Value="▶ Запустить анимацию" />
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding IsPlaying}" Value="True">
+                                        <Setter Property="Background" Value="#B33B3B" />
+                                        <Setter Property="BorderBrush" Value="#FF8A8A" />
+                                        <Setter Property="Content" Value="■ Остановить анимацию" />
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </Button.Style>
+                    </Button>
+                </StackPanel>
+            </Grid>
+        </StackPanel>
+
+        <Grid Grid.Row="2">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="*" />
+                <ColumnDefinition Width="280" />
+            </Grid.ColumnDefinitions>
+            <Border
+                Grid.Column="0"
+                Margin="0,0,10,0"
+                Padding="8"
+                Style="{StaticResource GlassCard}">
+                <local:HarmonicOscillationsCanvas
+                    x:Name="ChartCanvas"
+                    MinHeight="200"
+                    HorizontalAlignment="Stretch"
+                    VerticalAlignment="Stretch"
+                    DataContext="{Binding}" />
+            </Border>
+            <Border Grid.Column="1" Style="{StaticResource GlassCard}">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel>
+                        <TextBlock
+                            Margin="0,0,0,8"
+                            FontSize="18"
+                            FontWeight="SemiBold"
+                            Foreground="#F1F7FF"
+                            Text="Результаты" />
+                        <TextBlock Foreground="#C7DAF4"><Run Text="🌀 Угл. скорость ω (рад/с): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#85E9FF"
+                                Text="{Binding Omega, StringFormat=F2}" /></TextBlock>
+                        <TextBlock Margin="0,4,0,0" Foreground="#C7DAF4"><Run Text="≈ Частота f (Гц): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#B3E18A"
+                                Text="{Binding Frequency, StringFormat=F2}" /></TextBlock>
+                        <TextBlock Margin="0,4,0,0" Foreground="#C7DAF4"><Run Text="🚗 Тек. скорость ω (рад/с): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#85E9FF"
+                                Text="{Binding CurrentAngularSpeed, Mode=OneWay, StringFormat=F2}" /></TextBlock>
+                        <TextBlock Margin="0,4,0,0" Foreground="#C7DAF4"><Run Text="🏎 Тек. скорость v (м/с): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#FFE16C"
+                                Text="{Binding CurrentV, StringFormat=F3}" /></TextBlock>
+                        <TextBlock Margin="0,4,0,0" Foreground="#C7DAF4"><Run Text="📍 Тек. смещение x (м): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#A8D7FF"
+                                Text="{Binding CurrentX, StringFormat=F3}" /></TextBlock>
+                        <TextBlock Margin="0,4,0,0" Foreground="#C7DAF4"><Run Text="🧭 Тек. ускорение a (м/с²): " /><Run
+                                FontWeight="Bold"
+                                Foreground="#FFB366"
+                                Text="{Binding CurrentA, StringFormat=F3}" /></TextBlock>
+
+                        <Expander
+                            Margin="0,12,0,0"
+                            Foreground="#DCEBFF"
+                            Header="Формулы"
+                            IsExpanded="True">
+                            <StackPanel Margin="0,6,0,0">
+                                <TextBlock Foreground="#C7DAF4" Text="x(t) = A·cos(ωt + φ₀)" />
+                                <TextBlock Foreground="#C7DAF4" Text="v(t) = −Aω·sin(ωt + φ₀)" />
+                                <TextBlock Foreground="#C7DAF4" Text="a(t) = −ω²·x(t)" />
+                                <TextBlock Foreground="#C7DAF4" Text="ω = 2π/T,   f = ω/(2π)" />
+                                <TextBlock Foreground="#9CB4D6" Text="aτ = dv/dt,   a = aτ + an" />
+                            </StackPanel>
+                        </Expander>
+                    </StackPanel>
+                </ScrollViewer>
+            </Border>
+        </Grid>
+
+        <Border
+            Grid.Row="3"
+            Margin="0,10,0,0"
+            Style="{StaticResource GlassCard}">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto" />
+                    <RowDefinition Height="128" />
+                </Grid.RowDefinitions>
+                <TextBlock
+                    Margin="2,2,40,6"
+                    FontSize="16"
+                    FontWeight="SemiBold"
+                    Foreground="#F1F7FF"
+                    Text="Объяснение" />
+                <TextBlock
+                    Grid.Row="0"
+                    Margin="0,0,8,0"
+                    HorizontalAlignment="Right"
+                    VerticalAlignment="Center"
+                    FontSize="28"
+                    Foreground="#7F90AD"
+                    Text="⚙" />
+                <ScrollViewer
+                    Grid.Row="1"
+                    Margin="2,0,2,2"
+                    VerticalScrollBarVisibility="Auto">
+                    <TextBox
+                        Padding="0"
+                        AcceptsReturn="True"
+                        Background="Transparent"
+                        BorderThickness="0"
+                        Foreground="#D5E8FF"
+                        IsReadOnly="True"
+                        Text="{Binding ExplanationText, Mode=OneWay}"
+                        TextWrapping="Wrap" />
+                </ScrollViewer>
+            </Grid>
+        </Border>
+    </Grid>
+</UserControl>
